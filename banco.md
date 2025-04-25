@@ -53,6 +53,6 @@ model DadosMentais{
 
 
 
-diagrama MER x DER:
+diagrama MER x DER primeira att:
 
 ![alt text](image.png)
