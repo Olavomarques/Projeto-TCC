@@ -59,6 +59,6 @@ Diagrama MER x DER:
 
 
 
-Diagrama de classes
+Diagrama de classes:
 
 ![alt text](image-1.png)
