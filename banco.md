@@ -1,5 +1,5 @@
 codigo prisma primeira att
-```
+
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -46,13 +46,19 @@ model DadosMentais{
 
   user User @relation(fields: [id_user], references: [id_user])
 }
-```
 
 
 
 
 
 
-diagrama MER x DER primeira att:
 
-![alt text](image.png)
+Diagrama MER x DER:
+
+![alt text](image-2.png)
+
+
+
+Diagrama de classes
+
+![alt text](image-1.png)
