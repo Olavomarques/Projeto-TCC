@@ -31,7 +31,7 @@ Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que inc
 - vsCode
 - insominia
 - draw.io
-- 
+- Canva
 
 ## 📌 Objetivo
 
@@ -59,8 +59,12 @@ https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f
 ### Diagrama de Classes:
 ![alt text](./assets/DC.png)
 
-### DER(Diagrama Entidade Relacionamento)
+### DER(Diagrama Entidade Relacionamento):
 ![alt text](./assets/DER.png)
 
+### Triangulo de ferro:
+![alt text](./assets/Triangulo.png)
 
+### Matriz SOWT:
+![alt text](./assets/SOWT.png)
 
