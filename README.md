@@ -68,3 +68,6 @@ https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f
 ### Matriz SOWT:
 ![alt text](./assets/SOWT.png)
 
+### Gráfico Gant
+![alt text](./assets/cronograma.png)
+
