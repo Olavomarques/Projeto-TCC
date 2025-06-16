@@ -20,7 +20,6 @@ Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que inc
   - Planejamento de treinos
   - Metas e progresso
 
-- **Alimentação**
   - Planejamento alimentar
   - Registro de refeições
   - Dicas nutricionais
@@ -28,25 +27,40 @@ Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que inc
 
 ## 🛠 Tecnologias Utilizadas
 
-- Figma (protótipo)
-- [Adicionar aqui as tecnologias caso haja desenvolvimento: ex. Flutter, React Native, etc.]
+- figma
+- vsCode
+- insominia
+- draw.io
+- 
 
 ## 📌 Objetivo
 
-Oferecer uma solução digital que ajude pessoas a monitorar e melhorar sua saúde mental, física e alimentar, de maneira acessível, simples e intuitiva.
+Oferecer uma solução digital que ajude pessoas a monitorar e melhorar sua saúde mental e física , de maneira acessível, simples e intuitiva.
 
 ## 🔗 Protótipo
 
-[Insira aqui o link do protótipo no Figma ou similar]
+### Mobile:
+https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?t=svQYMTbgD4yqaVMl-0&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&node-id=2-11&starting-point-node-id=2%3A11
+
+### Web: 
+https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f&t=1OR7K2tVsrW50HFI-0&scaling=scale-down&content-scaling=fixed&page-id=111%3A372&starting-point-node-id=143%3A612
 
 ## 👥 Equipe
 
-- [Seu nome ou nomes da equipe]
-- [Orientador, se houver]
+- João Lucas Ribeiro Leite
+- Maria Eduarda Silva Barroso
+- Milena da Silva Felisbelo
+- Olavo da Silva Marques
 
-## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
----
+## Analises:
+
+### Diagrama de Classes:
+![alt text](./assets/DC.png)
+
+### DER(Diagrama Entidade Relacionamento)
+![alt text](./assets/DER.png)
+
+
 
