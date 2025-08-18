@@ -1,5 +1,5 @@
 import express from "express";
-import { chatIA } from "./controllers/mensagem";
+import { chatIA } from "./controllers/mensagem.js";
 
 const router = express.Router();
 

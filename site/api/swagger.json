@@ -40,7 +40,20 @@
         {
             "name": "User",
             "description": "Endpoints para cadastro de usuários"
+        },
+        {
+            "name": "Rotas de Login",
+            "description": "Endpoints para login e autenticação"
+        },
+        {
+            "name": "Dados Físicos",
+            "description": "Endpoints para manipulação de dados físicos dos usuários"
+        },
+        {
+            "name": "Dados Mentais",
+            "description": "Endpoints para manipulação de dados mentais dos usuários"
         }
+        
     ],
     "paths": {
         "/": {
@@ -187,11 +200,186 @@
                     }
                 }
             }
+        },
+        "/dadosfisicos": {
+        "get": {
+            "tags": ["Dados Físicos"],
+            "summary": "Endpoint para listar dados físicos",
+            "security": [{"bearerAuth": []}],
+            "responses": {
+                "200": {
+                    "description": "Lista de dados físicos retornada com sucesso",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/DadosFisicos"
+                                }
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Erro ao processar a requisição"
+                }
+            }
+        },
+        "post": {
+            "tags": ["Dados Físicos"],
+            "summary": "Endpoint para cadastrar dados físicos",
+            "security": [{"bearerAuth": []}],  
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id_user": {
+                                    "type": "integer",
+                                    "description": "ID do usuário associado"
+                                },
+                                "altura": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "description": "Altura em metros"
+                                },
+                                "peso": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "description": "Peso em kg"
+                                },
+                                "idade": {
+                                    "type": "integer",
+                                    "description": "Idade em anos"
+                                },
+                                "sexo": {
+                                    "type": "string",
+                                    "enum": ["M", "F", "Outro"],
+                                    "description": "Sexo biológico"
+                                },
+                                "exeReg": {
+                                    "type": "string",
+                                    "description": "Frequência de exercícios"
+                                },
+                                "obj": {
+                                    "type": "string",
+                                    "description": "Objetivo físico"
+                                },
+                                "deli": {
+                                    "type": "string",
+                                    "description": "Restrições alimentares"
+                                }
+                            },
+                            "required": ["id_user", "altura", "peso", "idade", "sexo"]  
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "201": {
+                    "description": "Dados físicos cadastrados com sucesso",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DadosFisicos"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Dados inválidos"
+                },
+                "500": {
+                    "description": "Erro ao processar a requisição"
+                }
+            }
         }
-
+    },
+    "/dadosmentais": {
+        "get": {
+            "tags": ["Dados Mentais"],
+            "summary": "Endpoint para listar dados mentais",
+            "security": [{"bearerAuth": []}],
+            "responses": {
+                "200": {
+                    "description": "Lista de dados mentais retornada com sucesso",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/DadosMentais"
+                                }
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Erro ao processar a requisição"
+                }
+            }
+        },
+        "post": {
+            "tags": ["Dados Mentais"],
+            "summary": "Endpoint para cadastrar dados mentais",
+            "security": [{"bearerAuth": []}],  
+            "requestBody": {
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "id_user": {
+                                    "type": "integer",
+                                    "description": "ID do usuário associado"
+                                },
+                                "sonoPerDia": {
+                                    "type": "integer",
+                                    "description": "Horas de sono por dia"
+                                },
+                                "trabPerDia": {
+                                    "type": "integer",
+                                    "description": "Horas de trabalho por dia"
+                                },
+                                "tempHobby": {
+                                    "type": "integer",
+                                    "description": "Tempo para hobbies por dia"
+                                },
+                                "trans": {
+                                    "type": "string",
+                                    "description": "algum transtorno mental"
+                                }
+                            },
+                            "required": ["id_user", "sonoPerDia", "trabPerDia", "tempHobby"]  
+                        }
+                    }
+                }
+            },
+            "responses": {
+                "201": {
+                    "description": "Dados mentais cadastrados com sucesso",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DadosMentais"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Dados inválidos"
+                },
+                "500": {
+                    "description": "Erro ao processar a requisição"
+                }
+            }
+        }
 
 
 
         
     }
-}
+}}
