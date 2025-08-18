@@ -7,122 +7,112 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id_user Int @id @default(autoincrement())
-  nome String
-  email String @unique
-  senha String
-  nascimento DateTime
-  genero String
-  Dadosfisicos DadosFisicos[]
-  Dadosmentais DadosMentais[]
-  Diario diario[] 
-  ProfissionalUser ProfissionalUser[]
-  medUser medUser[]
-  TreinoUser TreinoUser[]
+enum Genero {
+  MASCULINO
+  FEMININO
 }
 
-model DadosFisicos{
-  id_dadosfisicos Int @id @default(autoincrement())
-  id_user Int
-  altura Float
-  peso Float
-  idade Int
-  sexo String
-  exeReg String
-  obj String
-  deli String?
-
-  user User @relation(fields: [id_user], references: [id_user])
-
+enum Sexo {
+  MASCULINO
+  FEMININO
 }
 
-model DadosMentais{
-  id_dadosmentais Int @id @default(autoincrement())
-  id_user Int
-  sonoPerDia Int
-  trabPerDia Int
-  tempHobby Int
-  transt String?
-
-  user User @relation(fields: [id_user], references: [id_user])
+model User {
+  id_user       Int              @id @default(autoincrement())
+  nome          String
+  email         String           @unique
+  senha         String           @db.VarChar(255)
+  nascimento    DateTime
+  genero        Genero
+  Dadosfisicos  DadosFisicos[]
+  Dadosmentais  DadosMentais[]
+  Diario        Diario[]
+  medUser       MedUser[]
+  treinos       Treino[]
 }
 
-model diario{
-  id_diario Int @id @default(autoincrement())
-  id_user Int
-  exercicio_feitos Int
-  calorias_gastas Float
-  copos_bebidos Int
-
-  user User @relation(fields: [id_user], references: [id_user])
+model DadosFisicos {
+  id_dadosfisicos Int     @id @default(autoincrement())
+  user            User    @relation(fields: [id_user], references: [id_user])
+  id_user         Int
+  altura          Float
+  peso            Float
+  idade           Int
+  sexo            Sexo
+  exeReg          String
+  obj             String
+  deli            String?
 }
 
-model proficional{
-  id_profissional Int @id @default(autoincrement())
-  nome String
-  idade Int
-  email String @unique
-  senha String
-
-  profissionalUser ProfissionalUser[]
-
+model DadosMentais {
+  id_dadosmentais Int     @id @default(autoincrement())
+  user            User    @relation(fields: [id_user], references: [id_user])
+  id_user         Int
+  sonoPerDia      Int
+  trabPerDia      Int
+  tempHobby       Int
+  transt          String?
 }
 
-model ProfissionalUser {
-  id_profissional_user Int @id @default(autoincrement())
-  id_profissional Int
-  id_user Int
-
-  profissional proficional @relation(fields: [id_profissional], references: [id_profissional])
-  user User @relation(fields: [id_user], references: [id_user])
+model Diario {
+  id_diario         Int     @id @default(autoincrement())
+  user              User    @relation(fields: [id_user], references: [id_user])
+  id_user           Int
+  exercicio_feitos  Int
+  calorias_gastas   Float
+  copos_bebidos     Int
+  metros_andados    Int
+  dia               DateTime @default(now())
 }
 
-model meditacao{
-  id_meditacao Int @id @default(autoincrement())
-  nome String
-  descricao String
 
-  medUser medUser[]
-
+model Meditacao {
+  id_meditacao Int      @id @default(autoincrement())
+  nome         String
+  descricao    String
+  medUser      MedUser[]
 }
 
-model medUser {
-  id_med_user Int @id @default(autoincrement())
-  id_user Int
+model MedUser {
+  id_med_user  Int       @id @default(autoincrement())
+  user         User      @relation(fields: [id_user], references: [id_user])
+  id_user      Int
+  meditacao    Meditacao @relation(fields: [id_meditacao], references: [id_meditacao])
   id_meditacao Int
-
-  user User @relation(fields: [id_user], references: [id_user])
-  meditacao meditacao @relation(fields: [id_meditacao], references: [id_meditacao])
+  data         DateTime  @default(now())
+  duracao      Int
 }
 
-enum GrupoMusc {
-  UM
-  DOIS
-  TRES
-  QUATRO
-  CINCO
+model Exercicio {
+  id_exercicio Int         @id @default(autoincrement())
+  nome         String
+  descricao    String
+  img          String
+  ExerSelec    ExerSelec[]
 }
 
-enum Nivel {
-  UM
-  DOIS
-  TRES
+model ExerSelec {
+  id_ExerSelec Int          @id @default(autoincrement())
+  exercicio    Exercicio    @relation(fields: [id_exercicio], references: [id_exercicio])
+  id_exercicio Int
+  series       Int
+  repeticoes   Int
+  peso         Float?
+  treinosLink  TreinosLink[]
+}
+
+model TreinosLink {
+  id_link     Int      @id @default(autoincrement())
+  exerSelec   ExerSelec @relation(fields: [id_ExerSelec], references: [id_ExerSelec])
+  id_ExerSelec Int
+  treino      Treino    @relation(fields: [id_treino], references: [id_treino])
+  id_treino   Int
 }
 
 model Treino {
-  id_treino Int       @id @default(autoincrement())
-  grupomusc GrupoMusc
-  nivel     Nivel
-
-  treinoUser TreinoUser[]
-}
-
-model TreinoUser {
-  id_treino_user Int @id @default(autoincrement())
-  id_user Int
-  id_treino Int
-
-  user User @relation(fields: [id_user], references: [id_user])
-  treino Treino @relation(fields: [id_treino], references: [id_treino])
+  id_treino    Int          @id @default(autoincrement())
+  nome         String
+  user         User         @relation(fields: [id_user], references: [id_user])
+  id_user      Int
+  treinosLinks TreinosLink[]
 }

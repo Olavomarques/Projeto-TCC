@@ -3,9 +3,9 @@ CREATE TABLE `User` (
     `id_user` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
-    `senha` VARCHAR(191) NOT NULL,
+    `senha` VARCHAR(255) NOT NULL,
     `nascimento` DATETIME(3) NOT NULL,
-    `genero` VARCHAR(191) NOT NULL,
+    `genero` ENUM('MASCULINO', 'FEMININO') NOT NULL,
 
     UNIQUE INDEX `User_email_key`(`email`),
     PRIMARY KEY (`id_user`)
@@ -18,7 +18,7 @@ CREATE TABLE `DadosFisicos` (
     `altura` DOUBLE NOT NULL,
     `peso` DOUBLE NOT NULL,
     `idade` INTEGER NOT NULL,
-    `sexo` VARCHAR(191) NOT NULL,
+    `sexo` ENUM('MASCULINO', 'FEMININO') NOT NULL,
     `exeReg` VARCHAR(191) NOT NULL,
     `obj` VARCHAR(191) NOT NULL,
     `deli` VARCHAR(191) NULL,
@@ -39,39 +39,20 @@ CREATE TABLE `DadosMentais` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `diario` (
+CREATE TABLE `Diario` (
     `id_diario` INTEGER NOT NULL AUTO_INCREMENT,
     `id_user` INTEGER NOT NULL,
     `exercicio_feitos` INTEGER NOT NULL,
     `calorias_gastas` DOUBLE NOT NULL,
     `copos_bebidos` INTEGER NOT NULL,
+    `metros_andados` INTEGER NOT NULL,
+    `dia` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id_diario`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `proficional` (
-    `id_profissional` INTEGER NOT NULL AUTO_INCREMENT,
-    `nome` VARCHAR(191) NOT NULL,
-    `idade` INTEGER NOT NULL,
-    `email` VARCHAR(191) NOT NULL,
-    `senha` VARCHAR(191) NOT NULL,
-
-    UNIQUE INDEX `proficional_email_key`(`email`),
-    PRIMARY KEY (`id_profissional`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `ProfissionalUser` (
-    `id_profissional_user` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_profissional` INTEGER NOT NULL,
-    `id_user` INTEGER NOT NULL,
-
-    PRIMARY KEY (`id_profissional_user`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `meditacao` (
+CREATE TABLE `Meditacao` (
     `id_meditacao` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
     `descricao` VARCHAR(191) NOT NULL,
@@ -80,30 +61,53 @@ CREATE TABLE `meditacao` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `medUser` (
+CREATE TABLE `MedUser` (
     `id_med_user` INTEGER NOT NULL AUTO_INCREMENT,
     `id_user` INTEGER NOT NULL,
     `id_meditacao` INTEGER NOT NULL,
+    `data` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `duracao` INTEGER NOT NULL,
 
     PRIMARY KEY (`id_med_user`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Treino` (
-    `id_treino` INTEGER NOT NULL AUTO_INCREMENT,
-    `grupomusc` ENUM('UM', 'DOIS', 'TRES', 'QUATRO', 'CINCO') NOT NULL,
-    `nivel` ENUM('UM', 'DOIS', 'TRES') NOT NULL,
+CREATE TABLE `Exercicio` (
+    `id_exercicio` INTEGER NOT NULL AUTO_INCREMENT,
+    `nome` VARCHAR(191) NOT NULL,
+    `descricao` VARCHAR(191) NOT NULL,
+    `img` VARCHAR(191) NOT NULL,
 
-    PRIMARY KEY (`id_treino`)
+    PRIMARY KEY (`id_exercicio`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `TreinoUser` (
-    `id_treino_user` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_user` INTEGER NOT NULL,
+CREATE TABLE `ExerSelec` (
+    `id_ExerSelec` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_exercicio` INTEGER NOT NULL,
+    `series` INTEGER NOT NULL,
+    `repeticoes` INTEGER NOT NULL,
+    `peso` DOUBLE NULL,
+
+    PRIMARY KEY (`id_ExerSelec`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `TreinosLink` (
+    `id_link` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_ExerSelec` INTEGER NOT NULL,
     `id_treino` INTEGER NOT NULL,
 
-    PRIMARY KEY (`id_treino_user`)
+    PRIMARY KEY (`id_link`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Treino` (
+    `id_treino` INTEGER NOT NULL AUTO_INCREMENT,
+    `nome` VARCHAR(191) NOT NULL,
+    `id_user` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id_treino`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -113,22 +117,22 @@ ALTER TABLE `DadosFisicos` ADD CONSTRAINT `DadosFisicos_id_user_fkey` FOREIGN KE
 ALTER TABLE `DadosMentais` ADD CONSTRAINT `DadosMentais_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `diario` ADD CONSTRAINT `diario_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Diario` ADD CONSTRAINT `Diario_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProfissionalUser` ADD CONSTRAINT `ProfissionalUser_id_profissional_fkey` FOREIGN KEY (`id_profissional`) REFERENCES `proficional`(`id_profissional`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `MedUser` ADD CONSTRAINT `MedUser_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProfissionalUser` ADD CONSTRAINT `ProfissionalUser_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `MedUser` ADD CONSTRAINT `MedUser_id_meditacao_fkey` FOREIGN KEY (`id_meditacao`) REFERENCES `Meditacao`(`id_meditacao`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `medUser` ADD CONSTRAINT `medUser_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ExerSelec` ADD CONSTRAINT `ExerSelec_id_exercicio_fkey` FOREIGN KEY (`id_exercicio`) REFERENCES `Exercicio`(`id_exercicio`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `medUser` ADD CONSTRAINT `medUser_id_meditacao_fkey` FOREIGN KEY (`id_meditacao`) REFERENCES `meditacao`(`id_meditacao`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `TreinosLink` ADD CONSTRAINT `TreinosLink_id_ExerSelec_fkey` FOREIGN KEY (`id_ExerSelec`) REFERENCES `ExerSelec`(`id_ExerSelec`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `TreinoUser` ADD CONSTRAINT `TreinoUser_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `TreinosLink` ADD CONSTRAINT `TreinosLink_id_treino_fkey` FOREIGN KEY (`id_treino`) REFERENCES `Treino`(`id_treino`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `TreinoUser` ADD CONSTRAINT `TreinoUser_id_treino_fkey` FOREIGN KEY (`id_treino`) REFERENCES `Treino`(`id_treino`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Treino` ADD CONSTRAINT `Treino_id_user_fkey` FOREIGN KEY (`id_user`) REFERENCES `User`(`id_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
