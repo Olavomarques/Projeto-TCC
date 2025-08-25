@@ -9,20 +9,20 @@
 <body>
   <div class="cadastro-box">
     <h2>CADASTRE-SE ABAIXO</h2>
-    <form>
+    <form id="form-cadastro">
       <div class="input-group">
         <i class="fa fa-user"></i>
-        <input type="text" placeholder="Nome completo">
+        <input type="text" id="nome" placeholder="Nome completo" required>
       </div>
 
       <div class="input-group">
         <i class="fa fa-envelope"></i>
-        <input type="text" placeholder="Celular ou e-mail">
+        <input type="email" id="email" placeholder="Celular ou e-mail" required>
       </div>
 
       <div class="input-group">
         <i class="fa fa-lock"></i>
-        <input type="password" placeholder="Senha">
+        <input type="password" id="senha" placeholder="Senha" required>
       </div>
 
       <label class="label">Data de nascimento:</label>
@@ -34,8 +34,8 @@
 
       <label class="label">Gênero:</label>
       <div class="genero">
-        <label><input type="radio" name="genero"> F</label>
-        <label><input type="radio" name="genero"> M</label>
+        <label><input type="radio" name="genero" value="FEMININO" required> F</label>
+        <label><input type="radio" name="genero" value="MASCULINO" required> M</label>
       </div>
 
       <p class="info">
@@ -44,7 +44,7 @@
         Você poderá receber notificações por SMS e cancelar quando quiser.
       </p>
 
-      <a href="../inicio/index.html" class="btn">CADASTRA-SE</a>
+      <button type="submit" class="btn">CADASTRAR-SE</button>
     </form>
   </div>
 
