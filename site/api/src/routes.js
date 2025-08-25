@@ -6,7 +6,11 @@ const DadosFisicos = require('./controllers/controllerDadosFisicos')
 const DadosMentais = require('./controllers/controllerDadosMentais')
 const Diario = require('./controllers/controllerdiario')
 const Meditacao = require('./controllers/controllerMeditacao')
-// const MeditacaoUser = require('./controllers/controllermedUser')
+const MeditacaoUser = require('./controllers/controllermedUser')
+const Exercicio = require('./controllers/controllerExercicio')
+const ExerSelec = require('./controllers/controllerExerSelec')
+const Treino = require('./controllers/controllerTreino')
+const TreinoLink = require('./controllers/controllerTreinosLink')
 
 
 
@@ -50,12 +54,30 @@ routes.post('/meditacao', Meditacao.create)
 routes.put('/meditacao/:id', Meditacao.update)
 routes.delete('/meditacao/:id', Meditacao.remove)
 
-// routes.get('/meditacaouser', MeditacaoUser.read)
-// routes.post('/meditacaouser', MeditacaoUser.create)
-// routes.put('/meditacaouser/:id', MeditacaoUser.update)
-// routes.delete('/meditacaouser/:id', MeditacaoUser.remove)
+routes.get('/meditacaouser', MeditacaoUser.read)
+routes.post('/meditacaouser', MeditacaoUser.create)
+routes.put('/meditacaouser/:id', MeditacaoUser.update)
+routes.delete('/meditacaouser/:id', MeditacaoUser.remove)
 
+routes.get('/exercicio', require('./controllers/controllerExercicio').read)
+routes.post('/exercicio', require('./controllers/controllerExercicio').create)
+routes.put('/exercicio/:id', require('./controllers/controllerExercicio').update)
+routes.delete('/exercicio/:id', require('./controllers/controllerExercicio').remove)
 
+routes.get('/exerselec', require('./controllers/controllerExerSelec').read)
+routes.post('/exerselec', require('./controllers/controllerExerSelec').create)  
+routes.put('/exerselec/:id', require('./controllers/controllerExerSelec').update)
+routes.delete('/exerselec/:id', require('./controllers/controllerExerSelec').remove)
+
+routes.get('/treino', require('./controllers/controllerTreino').read)
+routes.post('/treino', require('./controllers/controllerTreino').create)
+routes.put('/treino/:id', require('./controllers/controllerTreino').update)
+routes.delete('/treino/:id', require('./controllers/controllerTreino').remove)
+
+routes.get('/treinolink', require('./controllers/controllerTreinosLink').read)
+routes.post('/treinolink', require('./controllers/controllerTreinosLink').create)
+routes.put('/treinolink/:id', require('./controllers/controllerTreinosLink').update)
+routes.delete('/treinolink/:id', require('./controllers/controllerTreinosLink').remove)
 
 
 module.exports = routes

@@ -3,18 +3,18 @@ const prisma = new PrismaClient()
 
 
 async function create(req, res) {
-    const { id_med_user, id_user, data, duracao} = req.body
+    const { id_exercicio, series, repeticoes, peso } = req.body
 
     try {
-        const id_med_user = await prisma.id_med_user.create({
+        const exerSelec = await prisma.exerSelec.create({
             data: {
-                id_med_user,
-                id_user,
-                data: new Date(),
-                duracao: 0,
+                id_exercicio,
+                series,
+                repeticoes,
+                peso
             }
         })
-        res.status(201).json(id_med_user)
+        res.status(201).json(exerSelec)
     } catch (error) {
         console.error('Error creating meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })
@@ -25,15 +25,15 @@ async function read(req, res) {
     const { id } = req.params
 
     try {
-        const id_med_user = await prisma.id_med_user.findMany({
+        const exerSelec = await prisma.exerSelec.findMany({
 
         })
 
-        if (!id_med_user) {
+        if (!exerSelec) {
             return res.status(404).json({ error: 'Meditation data not found' })
         }
 
-        res.status(200).json(id_med_user)
+        res.status(200).json(exerSelec)
     } catch (error) {
         console.error('Error reading meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })
@@ -42,20 +42,22 @@ async function read(req, res) {
 
 async function update(req, res) {
     const { id } = req.params
-    const { id_med_user, id_user, data, duracao } = req.body
+    const { id_exercicio, series, repeticoes, peso  } = req.body
 
     try {
-        const id_med_user = await prisma.id_med_user.update({
+        const exerSelec = await prisma.exerSelec.update({
             where: { id: parseInt(id) },
             data: {
-                id_med_user,
-                id_user,
-                data: new Date(),
-                duracao: 0,
+                id_exercicio,
+                series,
+                repeticoes,
+                peso
+
+
             }
         })
 
-        res.status(200).json(id_med_user)
+        res.status(200).json(exerSelec)
     } catch (error) {
         console.error('Error updating meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })
@@ -66,11 +68,11 @@ async function remove(req, res) {
     const { id } = req.params
 
     try {
-        const id_med_user = await prisma.id_med_user.delete({
+        const exerSelec = await prisma.exerSelec.delete({
             where: { id: parseInt(id) }
         })
 
-        res.status(200).json(id_med_user)
+        res.status(200).json(exerSelec)
     } catch (error) {
         console.error('Error deleting meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })
