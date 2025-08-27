@@ -187,7 +187,7 @@
                                     },
                                     "genero": {
                                         "type": "string",
-                                        "enum": ["Masculino", "Feminino"]
+                                        "enum": ["MASCULINO", "FEMININO"]
                                     }
                                     
                                 },
@@ -254,7 +254,7 @@
                                 },
                                 "sexo": {
                                     "type": "string",
-                                    "enum": ["M", "F", "Outro"],
+                                    "enum": ["MASCULINO", "FEMININO"],
                                     "description": "Sexo biológico"
                                 },
                                 "exeReg": {
