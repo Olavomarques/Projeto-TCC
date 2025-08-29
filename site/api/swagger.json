@@ -693,7 +693,7 @@
                 }
             },
             "responses": {
-                "200": {
+                "203": {
                     "description": "Exercício selecionado atualizado com sucesso"
                 },
                 "400": {
@@ -719,7 +719,7 @@
                 }
             ],
             "responses": {
-                "200": {
+                "204": {
                     "description": "Exercício selecionado deletado com sucesso"
                 },
                 "404": {
@@ -815,7 +815,7 @@
                 }
             },
             "responses": {
-                "200": {
+                "203": {
                     "description": "Treino atualizado com sucesso"
                 },
                 "400": {
@@ -841,7 +841,7 @@
                 }
             ],
             "responses": {
-                "200": {
+                "204": {
                     "description": "Treino deletado com sucesso"
                 },
                 "404": {
@@ -905,7 +905,7 @@
             }
         }
     },
-    "/treinolinkr/{id}": {
+    "/treinolink/{id}": {
         "put":{
             "tags": ["TreinoVisual"],
             "summary": "Endpoint para atualizar um exercício vinculado a um treino",
@@ -937,7 +937,7 @@
                 }
             },
             "responses": {
-                "200": {
+                "203": {
                     "description": "Exercício vinculado ao treino atualizado com sucesso"
                 },
                 "400": {
@@ -963,7 +963,7 @@
                 }
             ],
             "responses": {
-                "200": {
+                "204": {
                     "description": "Exercício vinculado ao treino deletado com sucesso"
                 },
                 "404": {
