@@ -2,12 +2,11 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
 async function create(req, res) {
-    const { id_dadosmentais, id_user, estresse, sono, humor, motivacao } = req.body
+    const {  id_user, sonoPerDia, trabPerDia, tempHobby, transt } = req.body
 
     try {
         const dadosMentais = await prisma.dadosMentais.create({
             data: {
-                id_dadosmentais,
                 id_user,
                 sonoPerDia,
                 trabPerDia,
@@ -43,17 +42,17 @@ async function read(req, res) {
 
 async function update(req, res) {
     const { id } = req.params
-    const { id_user, estresse, sono, humor, motivacao } = req.body
+    const { id_user, sonoPerDia, trabPerDia, tempHobby, transt } = req.body
 
     try {
         const dadosMentais = await prisma.dadosMentais.update({
             where: { id: parseInt(id) },
             data: {
                 id_user,
-                estresse,
-                sono,
-                humor,
-                motivacao
+                sonoPerDia,
+                trabPerDia,
+                tempHobby,
+                transt
             }
         })
 

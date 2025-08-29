@@ -145,11 +145,7 @@
                     "User"
                 ],
                 "summary": "Endpoint para listar usuários",
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ],
+                "security": [{"bearerAuth": []}],
                 "responses": {
                     "200": {
                         "description": "Lista de usuários retornada com sucesso"
@@ -187,7 +183,7 @@
                                     },
                                     "genero": {
                                         "type": "string",
-                                        "enum": ["Masculino", "Feminino"]
+                                        "enum": ["MASCULINO", "FEMININO"]
                                     }
                                     
                                 },
@@ -254,7 +250,7 @@
                                 },
                                 "sexo": {
                                     "type": "string",
-                                    "enum": ["M", "F", "Outro"],
+                                    "enum": ["MASCULINO", "FEMININO"],
                                     "description": "Sexo biológico"
                                 },
                                 "exeReg": {
@@ -442,7 +438,9 @@
                     "description": "Erro ao processar a requisição"
                 }
             }
-        },
+        }
+    },
+    "/medUser/{id}": {
         "put":{
             "tags": ["Meditação do usário"],
             "summary": "Endpoint para atualizar dados de meditação do usuário",
@@ -653,7 +651,9 @@
                 "500": {
                     "description": "Erro ao processar a requisição"
              }    }
-        },
+        }
+    },
+    "/ExerSelec/{id}": {
         "put":{
             "tags": ["Exercício selecionado"],
             "summary": "Endpoint para atualizar um exercício selecionado",
@@ -781,7 +781,9 @@
                     "description": "Erro ao processar a requisição"
                 }
             }   
-        },
+        }
+    },
+    "/treino/{id}": {
         "put":{
             "tags": ["Treino"],
             "summary": "Endpoint para atualizar um treino",
@@ -851,7 +853,7 @@
             }
         }
     },
-    "/TreinosLink": {
+    "/treinolink": {
         "get": {
             "tags": ["TreinoVisual"],
             "summary": "Endpoint para listar treinos com exercícios vinculados",
@@ -901,7 +903,9 @@
                     "description": "Erro ao processar a requisição"
                 }
             }
-        },
+        }
+    },
+    "/treinolinkr/{id}": {
         "put":{
             "tags": ["TreinoVisual"],
             "summary": "Endpoint para atualizar um exercício vinculado a um treino",
