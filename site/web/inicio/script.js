@@ -27,8 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
+        // salva token no navegador
         localStorage.setItem("token", data.token);
-        window.location.href = "../comeco/index.html";
+
+        alert("Login realizado com sucesso!");
+        // redireciona para a página do usuário
+        window.location.href = "../UsuarioCadastrado/index.html";
       } else {
         alert(data.message || "Erro ao logar!");
       }
