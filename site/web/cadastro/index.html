@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -44,6 +44,23 @@
         Você poderá receber notificações por SMS e cancelar quando quiser.
       </p>
 
+      <label class="label" for="sono">Horas de sono por dia:</label>
+      <div class="input-group">
+        <i class="fa fa-bed"></i>
+        <input type="number" id="sono" min="0" max="24" placeholder="Ex: 8" required>
+      </div>
+
+      <label class="label" for="trabalho">Horas de trabalho por dia:</label>
+      <div class="input-group">
+        <i class="fa fa-briefcase"></i>
+        <input type="number" id="trabalho" min="0" max="24" placeholder="Ex: 6" required>
+      </div>
+
+      <label class="label" for="hobbies">Horas para hobbies por dia:</label>
+      <div class="input-group">
+        <i class="fa fa-gamepad"></i>
+        <input type="number" id="hobbies" min="0" max="24" placeholder="Ex: 2" required>
+      </div>
       <button type="submit" class="btn">CADASTRAR-SE</button>
     </form>
   </div>
