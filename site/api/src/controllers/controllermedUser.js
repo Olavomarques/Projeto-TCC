@@ -42,19 +42,14 @@ async function read(req, res) {
 
 async function update(req, res) {
     const { id } = req.params
-    const { id_user, data, duracao } = req.body
 
     try {
         const medUser = await prisma.medUser.update({
-            where: { id: parseInt(id) },
-            data: {
-                id_user,
-                data: new Date(),
-                duracao : 0,
-            }
+            where: { id_med_user: parseInt(id) },
+            data: req.body
         })
 
-        res.status(200).json(medUser)
+        res.status(202).json(medUser)
     } catch (error) {
         console.error('Error updating meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })
@@ -66,10 +61,10 @@ async function remove(req, res) {
 
     try {
         const medUser = await prisma.medUser.delete({
-            where: { id: parseInt(id) }
+            where: { id_med_user: parseInt(id) }
         })
 
-        res.status(200).json(medUser)
+        res.status(204).json(medUser)
     } catch (error) {
         console.error('Error deleting meditation data:', error)
         res.status(500).json({ error: 'Internal Server Error' })

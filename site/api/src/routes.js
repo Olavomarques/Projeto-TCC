@@ -64,20 +64,20 @@ routes.post('/exercicio', Exercicio.create)
 routes.put('/exercicio/:id', Exercicio.update)
 routes.delete('/exercicio/:id', Exercicio.remove)
 
-routes.get('/exerselec', require('./controllers/controllerExerSelec').read)
-routes.post('/exerselec', require('./controllers/controllerExerSelec').create)  
-routes.put('/exerselec/:id', require('./controllers/controllerExerSelec').update)
-routes.delete('/exerselec/:id', require('./controllers/controllerExerSelec').remove)
+routes.get('/exerselec', ExerSelec.read)
+routes.post('/exerselec', ExerSelec.create)  
+routes.put('/exerselec/:id', ExerSelec.update)
+routes.delete('/exerselec/:id', ExerSelec.remove)
 
-routes.get('/treino', require('./controllers/controllerTreino').read)
-routes.post('/treino', require('./controllers/controllerTreino').create)
-routes.put('/treino/:id', require('./controllers/controllerTreino').update)
-routes.delete('/treino/:id', require('./controllers/controllerTreino').remove)
+routes.get('/treino', Treino.read)
+routes.post('/treino', Treino.create)
+routes.put('/treino/:id', Treino.update)
+routes.delete('/treino/:id', Treino.remove)
 
-routes.get('/treinolink', require('./controllers/controllerTreinosLink').read)
-routes.post('/treinolink', require('./controllers/controllerTreinosLink').create)
-routes.put('/treinolink/:id', require('./controllers/controllerTreinosLink').update)
-routes.delete('/treinolink/:id', require('./controllers/controllerTreinosLink').remove)
+routes.get('/treinolink', TreinoLink.read)
+routes.post('/treinolink', TreinoLink.create)
+routes.put('/treinolink/:id', TreinoLink.update)
+routes.delete('/treinolink/:id', TreinoLink.remove)
 
 
 module.exports = routes

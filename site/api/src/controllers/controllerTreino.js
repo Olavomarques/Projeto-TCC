@@ -45,7 +45,7 @@ async function update(req, res) {
 
     try {
         const treino = await prisma.treino.update({
-            where: { id: parseInt(id) },
+            where: { id_treino: parseInt(id) },
             data: {
                 nome, 
                 id_user
@@ -64,7 +64,7 @@ async function remove(req, res) {
 
     try {
         const treino = await prisma.treino.delete({
-            where: { id: parseInt(id) }
+            where: { id_treino: parseInt(id) }
         })
 
         res.status(200).json(treino)
