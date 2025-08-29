@@ -11,15 +11,8 @@ const Exercicio = require('./controllers/controllerExercicio')
 const ExerSelec = require('./controllers/controllerExerSelec')
 const Treino = require('./controllers/controllerTreino')
 const TreinoLink = require('./controllers/controllerTreinosLink')
-
-
-
 const MiddlewareAuth = require('./middlewares/auth');
 const Login = require('./controllers/login');
-
-
-
-
 
 routes.get('/', function (req, res) {
     res.send('API de Pulse+')
