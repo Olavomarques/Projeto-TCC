@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token); // salva token JWT
+        localStorage.setItem("token", data.token);
         window.location.href = "../comeco/index.html";
       } else {
         alert(data.message || "Erro ao logar!");

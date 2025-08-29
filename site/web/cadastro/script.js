@@ -53,6 +53,7 @@ form.addEventListener("submit", async (e) => {
 
   const user = { nome, email, senha, nascimento, genero };
 
+
   try {
     const res = await fetch("http://localhost:3000/user", {
       method: "POST",

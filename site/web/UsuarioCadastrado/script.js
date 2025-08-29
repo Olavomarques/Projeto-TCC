@@ -1,7 +1,5 @@
-// Atualiza ano no footer
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// ====== CALCULADORA IMC ======
 document.getElementById("calcImc").addEventListener("click", () => {
   const peso = parseFloat(document.getElementById("peso").value);
   const alturaCm = parseFloat(document.getElementById("altura").value);
@@ -20,7 +18,6 @@ document.getElementById("calcImc").addEventListener("click", () => {
   document.getElementById("imcLabel").textContent = label;
 });
 
-// ====== CALCULADORA TMB ======
 document.getElementById("calcTmb").addEventListener("click", () => {
   const sexo = document.getElementById("sexo").value;
   const idade = parseInt(document.getElementById("idade").value);
