@@ -3,11 +3,11 @@
 
 **Pulse+** é um aplicativo voltado para o cuidado integral da saúde — mental, física e alimentar — oferecendo ferramentas práticas, conteúdo educativo e acompanhamento personalizado para promover o bem-estar dos usuários.
 
-## 📱 Sobre o Projeto
+##  Sobre o Projeto
 
 Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que incentivem uma vida mais equilibrada e saudável. O aplicativo permite que o usuário acompanhe sua rotina, registre hábitos saudáveis e receba orientações personalizadas.
 
-### ✨ Funcionalidades Principais
+###  Funcionalidades Principais
 
 - **Saúde Mental**
   - Diário emocional
@@ -25,7 +25,7 @@ Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que inc
   - Dicas nutricionais
   - Lembretes de hidratação
 
-## 🛠 Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 - figma
 - vsCode
@@ -33,11 +33,11 @@ Pulse+ nasceu com o objetivo de integrar em um só lugar funcionalidades que inc
 - draw.io
 - Canva
 
-## 📌 Objetivo
+##  Objetivo
 
 Oferecer uma solução digital que ajude pessoas a monitorar e melhorar sua saúde mental e física , de maneira acessível, simples e intuitiva.
 
-## 🔗 Protótipo
+##  Protótipo
 
 ### Mobile:
 https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?t=svQYMTbgD4yqaVMl-0&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&node-id=2-11&starting-point-node-id=2%3A11
@@ -45,7 +45,7 @@ https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?t=svQYMTbgD4yqaVMl-
 ### Web: 
 https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f&t=1OR7K2tVsrW50HFI-0&scaling=scale-down&content-scaling=fixed&page-id=111%3A372&starting-point-node-id=143%3A612
 
-## 👥 Equipe
+##  Equipe
 
 - João Lucas Ribeiro Leite
 - Maria Eduarda Silva Barroso
