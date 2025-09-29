@@ -13,8 +13,9 @@
       <nav class="nav">
         <a href="#inicio">Início</a>
         <a href="#programas">Programas</a>
-        <a href="#ferramentas">Ferramentas</a>
         <a href="#nutricao">Nutrição</a>
+        <a href="#mentais">Mentais</a>
+        <a href="#ferramentas">Ferramentas</a>
         <a href="#contato">Contato</a>
       </nav>
     </div>
@@ -33,6 +34,8 @@
       </div>
     </section>
 
+
+    <!-- Programas -->
     <section id="programas" class="section">
       <div class="container">
         <header class="section-head">
@@ -65,6 +68,65 @@
       </div>
     </section>
 
+
+
+    <!-- Nutrição -->
+    <section id="nutricao" class="section">
+  <div class="container">
+    <header class="section-head">
+      <h2>Nutrição & Hábitos</h2>
+      <p>Pequenas escolhas que fazem diferença.</p>
+    </header>
+
+    <div class="grid-3">
+      <div class="card tip">
+        <h4>Prato Colorido</h4>
+        <p>Monte seu prato com ½ vegetais, ¼ proteína e ¼ carboidrato.</p>
+      </div>
+      <div class="card tip">
+        <h4>Proteína em cada refeição</h4>
+        <p>O alvo comum é 1,6–2,2 g/kg/dia distribuído ao longo do dia.</p>
+      </div>
+      <div class="card tip">
+        <h4>Sono é treinamento</h4>
+        <p>Apague telas 60 min antes de dormir e mantenha rotina regular.</p>
+      </div>
+    </div>
+
+    <div class="subscribe card">
+      <h3>Receba um plano semanal por e-mail</h3>
+      <div class="row gap">
+        <input id="email" type="email" placeholder="seu@email.com" />
+        <button id="subscribe" class="btn primary">Quero receber</button>
+      </div>
+      <p id="subMsg" class="muted"></p>
+    </div>
+  </div>
+</section>
+
+
+
+  <!-- Dados Mentais -->
+  <section id="mentais" class="section">
+    <div class="container">
+      <header class="section-head">
+        <h2>Dados Mentais</h2>
+        <p>Converse com a IA para acompanhar seu bem-estar mental.</p>
+      </header>
+
+      <div class="subscribe card">
+        <h3>Converse com IA</h3>
+        <div class="row gap">
+          <input type="text" placeholder="Escreva aqui sua mensagem..." />
+          <button class="btn primary">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Ferramentas -->
 <section id="ferramentas" class="section alt">
   <div class="container grid-2">
     <div class="card tool">
@@ -80,7 +142,6 @@
       <div class="timer-display"><span id="timer">10:00</span></div>
       <div class="row gap">
         <button class="btn small outline" id="addWater">+ água</button>
-        <button class="btn small outline" id="addMinutes">+ 5 min</button>
       </div>
     </div>
 
@@ -151,39 +212,9 @@
   </div>
 </section>
 
-    <section id="nutricao" class="section">
-  <div class="container">
-    <header class="section-head">
-      <h2>Nutrição & Hábitos</h2>
-      <p>Pequenas escolhas que fazem diferença.</p>
-    </header>
 
-    <div class="grid-3">
-      <div class="card tip">
-        <h4>Prato Colorido</h4>
-        <p>Monte seu prato com ½ vegetais, ¼ proteína e ¼ carboidrato.</p>
-      </div>
-      <div class="card tip">
-        <h4>Proteína em cada refeição</h4>
-        <p>O alvo comum é 1,6–2,2 g/kg/dia distribuído ao longo do dia.</p>
-      </div>
-      <div class="card tip">
-        <h4>Sono é treinamento</h4>
-        <p>Apague telas 60 min antes de dormir e mantenha rotina regular.</p>
-      </div>
-    </div>
 
-    <div class="subscribe card">
-      <h3>Receba um plano semanal por e-mail</h3>
-      <div class="row gap">
-        <input id="email" type="email" placeholder="seu@email.com" />
-        <button id="subscribe" class="btn primary">Quero receber</button>
-      </div>
-      <p id="subMsg" class="muted"></p>
-    </div>
-  </div>
-</section>
-
+     <!-- Contato -->
     <section id="contato" class="section alt">
   <div class="container grid-2">
     <div class="contact-info">
