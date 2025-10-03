@@ -254,15 +254,32 @@ h2 {
   }
 }
 
+/* === NUTRIÇÃO CARROSSEL === */
 #nutricao .grid-3 {
-  display: grid;
+  display: flex;
   gap: 20px;
-  grid-template-columns: 1fr;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 10px;
+}
+
+#nutricao .grid-3::-webkit-scrollbar {
+  height: 8px;
+}
+#nutricao .grid-3::-webkit-scrollbar-thumb {
+  background: #c0c8d8;
+  border-radius: 10px;
+}
+
+#nutricao .card.tip {
+  flex: 0 0 80%; /* ocupa quase toda tela no mobile */
+  scroll-snap-align: start;
 }
 
 @media (min-width: 768px) {
-  #nutricao .grid-3 {
-    grid-template-columns: repeat(3, 1fr);
+  #nutricao .card.tip {
+    flex: 0 0 calc(33.333% - 20px); /* 3 cards lado a lado no desktop */
   }
 }
 
@@ -282,6 +299,43 @@ h2 {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* === CHAT IA === */
+.chatIA {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-box {
+  background: #f9f9f9;
+  border: 1px solid #d0d8e8;
+  border-radius: 10px;
+  padding: 10px;
+  height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-box .msg {
+  padding: 8px 12px;
+  margin: 6px 0;
+  border-radius: 10px;
+  max-width: 75%;
+  word-wrap: break-word;
+}
+
+.chat-box .user {
+  background: #d1e7ff;
+  align-self: flex-end;
+}
+
+.chat-box .bot {
+  background: #e8f5e9;
+  align-self: flex-start;
+}
+
 
 #contato .contact-info {
   display: flex;
