@@ -88,7 +88,7 @@ form.addEventListener("submit", async (e) => {
   const user = { nome, email, senha, nascimento, genero };
 
   try {
-    const res = await fetch("http://localhost:3001/User", {
+    const res = await fetch("https://backend-tcc-iota.vercel.app/user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user)

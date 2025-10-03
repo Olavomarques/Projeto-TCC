@@ -1,8 +1,6 @@
-// ================== ANO RODAPÉ ==================
 document.getElementById("year").textContent = new Date().getFullYear();
 
-
-// ================== IMC ==================
+// IMC
 document.getElementById("calcImc").addEventListener("click", () => {
   const peso = parseFloat(document.getElementById("peso").value);
   const alturaCm = parseFloat(document.getElementById("altura").value);
@@ -22,7 +20,7 @@ document.getElementById("calcImc").addEventListener("click", () => {
 });
 
 
-// ================== TMB ==================
+// TBM - Taxa Metabólica Basal
 document.getElementById("calcTmb").addEventListener("click", () => {
   const sexo = document.getElementById("sexo").value;
   const idade = parseInt(document.getElementById("idade").value);
@@ -43,7 +41,7 @@ document.getElementById("calcTmb").addEventListener("click", () => {
 });
 
 
-// ================== TIMER ==================
+// TEMPO
 let timerInterval;
 let timerSeconds = 600; // padrão 10 min
 
@@ -82,7 +80,7 @@ document.getElementById("addWater").addEventListener("click", () => {
 });
 
 
-// ================== SEQUÊNCIA & NOTAS ==================
+// NOTAS
 let progress = JSON.parse(localStorage.getItem("progress")) || {days:0, notes:[]};
 
 function renderNotes() {
@@ -115,7 +113,7 @@ document.getElementById("saveNotes").addEventListener("click", () => {
 });
 
 
-// ================== CHAT DADOS MENTAIS (API) ==================
+// CHAT
 const chatInput = document.querySelector("#mentais input");
 const chatBtn = document.querySelector("#mentais button");
 const chatBox = document.createElement("div");
@@ -147,14 +145,13 @@ function addMessage(text, from="user") {
 }
 
 async function botReply(userText) {
-  const API_URL = "http://localhost:3001/api/chat"; // rota da API Node
+  const API_URL = "https://backend-tcc-iota.vercel.app/";
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json"
-        // "Authorization": "Bearer SEU_TOKEN_AQUI" // se precisar token
       },
       body: JSON.stringify({ text: userText })
     });
