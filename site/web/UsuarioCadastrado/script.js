@@ -87,7 +87,7 @@ let progress = JSON.parse(localStorage.getItem("progress")) || {days:0, notes:[]
 
 function renderNotes() {
   const list = document.getElementById("notesList");
-  list.innerHTML = progress.notes.map(n => `<p>📌 ${n}</p>`).join("");
+  list.innerHTML = progress.notes.map(n => `<p>🗒️ ${n}</p>`).join("");
 }
 renderNotes();
 
@@ -147,7 +147,7 @@ function addMessage(text, from="user") {
 }
 
 async function botReply(userText) {
-  const API_URL = "http://localhost:3000/api/chat"; // rota da sua API Node
+  const API_URL = "http://localhost:3001/api/chat"; // rota da API Node
 
   try {
     const res = await fetch(API_URL, {
@@ -156,7 +156,7 @@ async function botReply(userText) {
         "Content-Type": "application/json"
         // "Authorization": "Bearer SEU_TOKEN_AQUI" // se precisar token
       },
-      body: JSON.stringify({ message: userText })
+      body: JSON.stringify({ text: userText })
     });
 
     const data = await res.json();
