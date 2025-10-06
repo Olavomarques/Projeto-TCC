@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Treinos</title>
+  <title>Criar Treino</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +13,20 @@
       <a href="../treinoscriados/index.html">Treinos Criados</a>
     </nav>
   </header>
+
   <main>
     <h2>Exercícios disponíveis</h2>
     <div id="exercicios-lista"></div>
+
     <h2>Meu Treino</h2>
     <div id="meu-treino"></div>
-    <button id="salvar-treino">Salvar Treino</button> 
-    <section id="treinos-criados"></section>
+
+    <div class="salvar-area">
+      <input type="text" id="nome-treino" placeholder="Digite o nome do treino">
+      <button id="salvar-treino">Salvar Treino</button>
+    </div>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>

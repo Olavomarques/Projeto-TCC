@@ -1,5 +1,5 @@
 const API_URL = "https://backend-tcc-iota.vercel.app"; // ajuste para sua API
-const userId = 1; // ID do usuário logado
+const id_user = 1; // ID do usuário logado
 
 const exercicios = [
   // Pernas e Glúteos
@@ -46,7 +46,7 @@ const exercicios = [
 // Array do treino do usuário
 let treinoSelecionado = [];
 
-// Exibir todos os exercícios
+// ------------------- EXIBIR EXERCÍCIOS -------------------
 function mostrarExercicios() {
   const container = document.getElementById("exercicios-lista");
   container.innerHTML = "";
@@ -68,19 +68,25 @@ function mostrarExercicios() {
   });
 }
 
-// Adicionar exercício ao treino
+// ------------------- ADICIONAR / REMOVER -------------------
 function adicionarTreino(id) {
   const ex = exercicios.find(e => e.id === id);
-  if (!treinoSelecionado.includes(ex)) {
+  if (!treinoSelecionado.some(e => e.id === id)) {
     treinoSelecionado.push(ex);
     mostrarTreino();
   }
 }
 
-// Exibir treino selecionado
+function removerDoTreino(id) {
+  treinoSelecionado = treinoSelecionado.filter(e => e.id !== id);
+  mostrarTreino();
+}
+
+// ------------------- EXIBIR TREINO -------------------
 function mostrarTreino() {
   const container = document.getElementById("meu-treino");
   container.innerHTML = treinoSelecionado.length ? "<h3>Treino Atual</h3>" : "";
+
   treinoSelecionado.forEach(ex => {
     const div = document.createElement("div");
     div.className = "exercicio-card";
@@ -90,7 +96,6 @@ function mostrarTreino() {
         <h3>${ex.nome}</h3>
         <p><strong>Grupo:</strong> ${ex.grupo}</p>
         <p>${ex.descricao}</p>
-        <p><strong>Duração:</strong> ${ex.duracao}</p>
         <p><strong>Séries:</strong> ${ex.series} | <strong>Repetições:</strong> ${ex.repeticoes}</p>
         <button onclick="removerDoTreino(${ex.id})">Remover</button>
       </div>
@@ -99,16 +104,16 @@ function mostrarTreino() {
   });
 }
 
-// Remover exercício do treino
-function removerDoTreino(id) {
-  treinoSelecionado = treinoSelecionado.filter(e => e.id !== id);
-  mostrarTreino();
-}
-
-// Salvar treino no backend
+// ------------------- SALVAR TREINO -------------------
 async function salvarTreino() {
-  if (!treinoSelecionado.length) {
-    alert("Selecione ao menos um exercício para salvar!");
+  const nomeTreino = document.getElementById("nome-treino").value.trim();
+
+  if (!nomeTreino) {
+    alert("Digite um nome para o treino!");
+    return;
+  }
+  if (treinoSelecionado.length === 0) {
+    alert("Selecione ao menos um exercício!");
     return;
   }
 
@@ -117,37 +122,35 @@ async function salvarTreino() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        nome: "Treino Personalizado", // nome fixo — pode mudar pra dinâmico depois
+        nome: nomeTreino,
         id_user: id_user
       })
     });
 
-    if (!resTreino.ok) throw new Error("Erro ao salvar treino");
-
+    if (!resTreino.ok) throw new Error("Erro ao criar treino");
     const treinoCriado = await resTreino.json();
     const id_treino = treinoCriado.id_treino;
 
-    // Aqui você pode salvar os exercícios vinculados ao treino se quiser
-for (const ex of treinoSelecionado) {
+    // Cria exercícios vinculados
+    for (const ex of treinoSelecionado) {
       const resEx = await fetch(`${API_URL}/exerselec`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id_exercicio: ex.id, 
-          series: ex.series || 3,
-          repeticoes: ex.repeticoes || 10,
-          peso: ex.peso || 0
+          id_exercicio: ex.id,
+          series: ex.series,
+          repeticoes: ex.repeticoes,
+          peso: 0
         })
       });
 
-      const exerSelecCriado = await resEx.json();
+      const exerSelec = await resEx.json();
 
-      // 3️⃣ Faz o link entre treino e exercício
       await fetch(`${API_URL}/treinoslink`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id_ExerSelec: exerSelecCriado.id_ExerSelec,
+          id_ExerSelec: exerSelec.id_ExerSelec,
           id_treino: id_treino
         })
       });
@@ -156,47 +159,17 @@ for (const ex of treinoSelecionado) {
     alert("Treino salvo com sucesso!");
     treinoSelecionado = [];
     mostrarTreino();
-    carregarTreinos();
 
+    // 👉 Redireciona direto para a página de treinos criados
+    window.location.href = "../treinoscriados/index.html";
   } catch (error) {
     console.error("Erro ao salvar treino:", error);
     alert("Erro ao salvar treino");
   }
 }
 
-// ------------------- CARREGAR TREINOS EXISTENTES -------------------
-
-async function carregarTreinos() {
-  try {
-    const res = await fetch(`${API_URL}/treino`);
-    const todosTreinos = await res.json();
-
-    const meusTreinos = todosTreinos.filter(t => t.id_user === userId);
-    const container = document.getElementById("treinos-criados");
-    container.innerHTML = "";
-
-    meusTreinos.forEach(t => {
-      const card = document.createElement("div");
-      card.classList.add("card-treino-salvo");
-      card.innerHTML = `
-        <h3>${t.nome}</h3>
-        <button onclick="abrirTreino(${t.id_treino})">Abrir</button>
-      `;
-      container.appendChild(card);
-    });
-
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-function abrirTreino(id) {
-  alert(`Abrindo treino ID: ${id}`);
-}
-
 // ------------------- INICIALIZAÇÃO -------------------
-
 document.addEventListener("DOMContentLoaded", () => {
-  mostrarExercicios("Todos");
-  carregarTreinos();
+  mostrarExercicios();
+  document.getElementById("salvar-treino").addEventListener("click", salvarTreino);
 });
