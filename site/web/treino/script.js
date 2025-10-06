@@ -1,4 +1,4 @@
-const API_URL = "https://backend-tcc-iota.vercel.app/treino"; // ajuste para sua API
+const API_URL = "https://backend-tcc-iota.vercel.app"; // ajuste para sua API
 const userId = 1; // ID do usuário logado
 
 const exercicios = [
@@ -113,28 +113,42 @@ async function salvarTreino() {
   }
 
   try {
-    // 1️⃣ Cria o treino
     const resTreino = await fetch(`${API_URL}/treino`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usuarioId: userId, data: new Date().toISOString() })
+      body: JSON.stringify({
+        nome: "Treino Personalizado", // nome fixo — pode mudar pra dinâmico depois
+        id_user: id_user
+      })
     });
 
     if (!resTreino.ok) throw new Error("Erro ao salvar treino");
 
     const treinoCriado = await resTreino.json();
+    const id_treino = treinoCriado.id_treino;
 
-    // 2️⃣ Salva cada exercício vinculado ao treino
-    for (let ex of treinoSelecionado) {
-      await fetch(`${API_URL}/exerselec`, {
+    // Aqui você pode salvar os exercícios vinculados ao treino se quiser
+for (const ex of treinoSelecionado) {
+      const resEx = await fetch(`${API_URL}/exerselec`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          treinoId: treinoCriado.id,
-          exercicioId: ex.id,
-          series: ex.series,
-          repeticoes: ex.repeticoes,
-          duracao: ex.duracao
+          id_exercicio: ex.id, 
+          series: ex.series || 3,
+          repeticoes: ex.repeticoes || 10,
+          peso: ex.peso || 0
+        })
+      });
+
+      const exerSelecCriado = await resEx.json();
+
+      // 3️⃣ Faz o link entre treino e exercício
+      await fetch(`${API_URL}/treinoslink`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id_ExerSelec: exerSelecCriado.id_ExerSelec,
+          id_treino: id_treino
         })
       });
     }
@@ -145,54 +159,44 @@ async function salvarTreino() {
     carregarTreinos();
 
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao salvar treino:", error);
     alert("Erro ao salvar treino");
   }
 }
 
-// Carregar treinos já salvos do usuário
+// ------------------- CARREGAR TREINOS EXISTENTES -------------------
+
 async function carregarTreinos() {
   try {
     const res = await fetch(`${API_URL}/treino`);
-    if (!res.ok) throw new Error("Erro ao carregar treinos");
-
     const todosTreinos = await res.json();
-    const meusTreinos = todosTreinos.filter(t => t.usuarioId === userId);
 
+    const meusTreinos = todosTreinos.filter(t => t.id_user === userId);
     const container = document.getElementById("treinos-criados");
-    container.innerHTML = "<h3>Treinos Salvos</h3>";
+    container.innerHTML = "";
 
-    if (!meusTreinos.length) {
-      container.innerHTML += "<p>Nenhum treino salvo ainda.</p>";
-      return;
-    }
-
-    for (let t of meusTreinos) {
-      // Busca exercícios do treino
-      const resExs = await fetch(`${API_URL}/exerselec`);
-      const todosExs = await resExs.json();
-      const exsDoTreino = todosExs.filter(e => e.treinoId === t.id);
-
-      const div = document.createElement("div");
-      div.className = "treino-salvo";
-      div.innerHTML = `
-        <h4>Treino #${t.id} - ${new Date(t.data).toLocaleDateString()}</h4>
-        <ul>
-          ${exsDoTreino.map(e => `<li>${exercicios.find(x => x.id === e.exercicioId)?.nome} (${e.series}x${e.repeticoes || e.duracao})</li>`).join("")}
-        </ul>
+    meusTreinos.forEach(t => {
+      const card = document.createElement("div");
+      card.classList.add("card-treino-salvo");
+      card.innerHTML = `
+        <h3>${t.nome}</h3>
+        <button onclick="abrirTreino(${t.id_treino})">Abrir</button>
       `;
-      container.appendChild(div);
-    }
+      container.appendChild(card);
+    });
 
   } catch (error) {
     console.error(error);
   }
 }
 
-// Eventos
-document.getElementById("salvar-treino").addEventListener("click", salvarTreino);
+function abrirTreino(id) {
+  alert(`Abrindo treino ID: ${id}`);
+}
 
-// Inicialização
-mostrarExercicios();
-mostrarTreino();
-carregarTreinos();
+// ------------------- INICIALIZAÇÃO -------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  mostrarExercicios("Todos");
+  carregarTreinos();
+});
