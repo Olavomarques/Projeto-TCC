@@ -25,6 +25,4 @@ const chatIA = async (req, res) => {
   }
 };
 
-module.exports = {
-  chatIA,
-};
+module.exports = { chatIA };
