@@ -17,6 +17,21 @@ enum Sexo {
   FEMININO
 }
 
+enum TipoExer {
+  Peito
+  lombar
+  dorsal
+  trapezio
+  abdomen
+  biceps
+  triceps
+  Ombros
+  quadriceps
+  posterior
+  gluteos
+  panturrilha
+}
+
 model User {
   id_user       Int              @id @default(autoincrement())
   nome          String
@@ -63,6 +78,7 @@ model Diario {
   copos_bebidos     Int
   metros_andados    Int
   dia               DateTime @default(now())
+  lastupdate        DateTime @updatedAt
 }
 
 
@@ -86,6 +102,7 @@ model MedUser {
 model Exercicio {
   id_exercicio Int         @id @default(autoincrement())
   nome         String
+  tipo         TipoExer
   descricao    String
   img          String
   ExerSelec    ExerSelec[]
