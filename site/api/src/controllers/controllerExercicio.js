@@ -3,12 +3,13 @@ const prisma = new PrismaClient()
 
 
 async function create(req, res) {
-    const { nome, descricao, img } = req.body
+    const { nome, tipo, descricao, img } = req.body
 
     try {
         const exercicio = await prisma.exercicio.create({
             data: {
                 nome,
+                tipo,
                 descricao,
                 img
             }
@@ -41,13 +42,14 @@ async function read(req, res) {
 
 async function update(req, res) {
     const { id } = req.params
-    const { nome, descricao, img  } = req.body
+    const { nome, tipo, descricao, img  } = req.body
 
     try {
         const exercicio = await prisma.exercicio.update({
             where: { id: parseInt(id) },
             data: {
                 nome,
+                tipo,
                 descricao,
                 img
             }

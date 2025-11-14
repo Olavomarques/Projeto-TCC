@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'parte_fisica.dart'; // Importe o arquivo onde está a tela ParteFisica
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -36,11 +37,17 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            // Ícone de halteres (exercício)
+            // Ícone de halteres (exercício) - AGORA COM NAVEGAÇÃO
             IconButton(
               icon: const FaIcon(FontAwesomeIcons.dumbbell),
               color: Colors.black,
-              onPressed: () {},
+              onPressed: () {
+                // Navega para a tela ParteFisica
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ParteFisica()),
+                );
+              },
             ),
           ],
         ),

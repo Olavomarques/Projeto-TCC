@@ -47,6 +47,7 @@ CREATE TABLE `Diario` (
     `copos_bebidos` INTEGER NOT NULL,
     `metros_andados` INTEGER NOT NULL,
     `dia` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `lastupdate` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id_diario`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -75,6 +76,7 @@ CREATE TABLE `MedUser` (
 CREATE TABLE `Exercicio` (
     `id_exercicio` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
+    `tipo` ENUM('Peito', 'lombar', 'dorsal', 'trapezio', 'abdomen', 'biceps', 'triceps', 'Ombros', 'quadriceps', 'posterior', 'gluteos', 'panturrilha') NOT NULL,
     `descricao` VARCHAR(191) NOT NULL,
     `img` VARCHAR(191) NOT NULL,
 
