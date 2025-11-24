@@ -19,6 +19,25 @@ class _LoginPageState extends State<LoginPage> {
   bool carregando = false;
   final LocalStorageService localStorage = LocalStorageService();
 
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingLogin();
+  }
+
+  Future<void> _checkExistingLogin() async {
+    final isLoggedIn = await localStorage.isUserLoggedIn();
+    if (isLoggedIn) {
+      final userId = await localStorage.getUserId();
+      final userEmail = await localStorage.getUserEmail();
+      print('USUÁRIO JÁ LOGADO - ID: $userId, Email: $userEmail');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    }
+  }
+
   Future<void> _login() async {
     setState(() {
       carregando = true;
@@ -100,25 +119,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       carregando = false;
     });
-  }
-
-  Future<void> _checkExistingLogin() async {
-    final isLoggedIn = await localStorage.isUserLoggedIn();
-    if (isLoggedIn) {
-      final userId = await localStorage.getUserId();
-      final userEmail = await localStorage.getUserEmail();
-      print('USUÁRIO JÁ LOGADO - ID: $userId, Email: $userEmail');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _checkExistingLogin();
   }
 
   @override

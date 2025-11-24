@@ -1,3 +1,4 @@
+// services/local_storage_service.dart
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
@@ -38,7 +39,9 @@ class LocalStorageService {
   // Verificar se usuário está logado
   Future<bool> isUserLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userIdKey) != null;
+    final userId = prefs.getString(_userIdKey);
+    final token = prefs.getString(_userTokenKey);
+    return userId != null && token != null;
   }
 
   // Limpar dados do usuário (logout)

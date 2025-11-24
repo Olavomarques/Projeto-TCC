@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'parte_fisica.dart';
-import '../services/localStorage.dart'; // Importe o service
+import '../services/localStorage.dart';
+import 'login.dart'; // ✅ ADICIONE ESTE IMPORT
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,8 +37,26 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _logout() async {
-    await localStorage.clearUserData();
-    Navigator.pushReplacementNamed(context, '/login');
+    try {
+      print('Fazendo logout...');
+      await localStorage.clearUserData();
+      print('Dados limpos do localStorage');
+      
+      // ✅ CORREÇÃO: Use MaterialPageRoute em vez de pushReplacementNamed
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false, // Remove todas as rotas anteriores
+      );
+    } catch (e) {
+      print('Erro durante logout: $e');
+      // Fallback seguro
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
   }
 
   @override

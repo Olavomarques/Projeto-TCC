@@ -1,5 +1,8 @@
+// main.dart
 import 'package:flutter/material.dart';
-import 'screens/login.dart';
+import './screens/login.dart';
+import './screens/home.dart';
+import './services/localStorage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,45 +14,53 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Meu Projeto Flutter',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const SplashScreen(),
+      title: 'Seu App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const AuthWrapper(), // Tela que decide para onde ir
     );
   }
 }
 
-// Tela de Splash
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _AuthWrapperState extends State<AuthWrapper> {
+  final LocalStorageService localStorage = LocalStorageService();
+  bool isLoading = true;
+  bool isLoggedIn = false;
+
   @override
   void initState() {
     super.initState();
+    _checkAuthStatus();
+  }
 
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-      );
+  Future<void> _checkAuthStatus() async {
+    final loggedIn = await localStorage.isUserLoggedIn();
+    
+    setState(() {
+      isLoggedIn = loggedIn;
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Image(
-          image: AssetImage("assets/logo.jpeg"),
-          width: 1000,
-          height: 1000,
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
-      ),
-    );
+      );
+    }
+
+    // Se estiver logado, vai direto para Home, senão para Login
+    return isLoggedIn ? const HomePage() : const LoginPage();
   }
 }

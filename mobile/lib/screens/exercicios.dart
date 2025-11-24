@@ -243,11 +243,19 @@ class _ExerciciosState extends State<Exercicios> {
             ),
             const SizedBox(height: 30),
 
-            // Título EXERCÍCIOS
+            // Título EXERCÍCIOS com botão de voltar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
+                  // Botão voltar
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () {
+                      Navigator.pop(context); // Volta para tela anterior
+                    },
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     'EXERCÍCIOS',
                     style: TextStyle(

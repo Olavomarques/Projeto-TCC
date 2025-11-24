@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'home.dart';
 import '../services/localStorage.dart';
-import 'exercicios.dart'; // ✅ CORRIGIDO: "exercicios.dart" (minúsculo)
+import 'exercicios.dart';
+import 'treino.dart';
 
 class ParteFisica extends StatefulWidget {
   const ParteFisica({super.key});
@@ -622,11 +623,11 @@ class _ParteFisicaState extends State<ParteFisica> {
   }
 
   void _verTreino(dynamic treino) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Abrindo: ${treino['nome']}'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => TelaTreino(treino: treino),
+    ),
+  );
+}
 }
