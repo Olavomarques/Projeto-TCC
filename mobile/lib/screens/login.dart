@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'cadastrar.dart';
 import 'home.dart';
+import '../services/localStorage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
   bool carregando = false;
+  final LocalStorageService localStorage = LocalStorageService();
 
   Future<void> _login() async {
     setState(() {
@@ -36,33 +38,47 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final url = Uri.parse("https://backend-tcc-iota.vercel.app/login");
 
-      // enviando também o campo "validade"
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "email": email,
           "senha": senha,
-          "validade": 2000, // aqui definimos a validade padrão
+          "validade": 2000,
         }),
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print('RESPOSTA DO LOGIN: $data');
 
-        // Verifica se veio o token no retorno
         if (data["token"] != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Login realizado com sucesso!")),
-          );
+          final String token = data["token"];
+          
+          // ✅ AGORA O BACKEND RETORNA O id_user DIRETAMENTE NA RESPOSTA
+          final String? userId = data["id_user"]?.toString();
+          
+          if (userId != null && userId.isNotEmpty) {
+            await localStorage.saveUserData(userId, token, email);
+            
+            print('✅ ID_USER SALVO: $userId');
+            print('✅ TOKEN SALVO: $token');
+            print('✅ EMAIL SALVO: $email');
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Login realizado com sucesso!")),
+            );
 
-          // Aqui você poderia salvar o token localmente, se quiser (SharedPreferences)
-          // e.g. await prefs.setString('token', data['token']);
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
-          );
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomePage()),
+            );
+          } else {
+            print('❌ id_user não veio na resposta do login');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Erro: ID do usuário não retornado")),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(data["message"] ?? "Credenciais inválidas")),
@@ -76,14 +92,33 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Erro de conexão: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro de conexão: $e")),
+      );
     }
 
     setState(() {
       carregando = false;
     });
+  }
+
+  Future<void> _checkExistingLogin() async {
+    final isLoggedIn = await localStorage.isUserLoggedIn();
+    if (isLoggedIn) {
+      final userId = await localStorage.getUserId();
+      final userEmail = await localStorage.getUserEmail();
+      print('USUÁRIO JÁ LOGADO - ID: $userId, Email: $userEmail');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingLogin();
   }
 
   @override
@@ -124,10 +159,9 @@ class _LoginPageState extends State<LoginPage> {
                 minimumSize: const Size(double.infinity, 50),
                 backgroundColor: Colors.blue,
               ),
-              child:
-                  carregando
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Entrar"),
+              child: carregando
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text("Entrar"),
             ),
 
             const SizedBox(height: 16),
