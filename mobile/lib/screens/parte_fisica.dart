@@ -98,6 +98,128 @@ class _ParteFisicaState extends State<ParteFisica> {
     }
   }
 
+  // ✅ MÉTODO PARA APAGAR TREINO EM CASCATA
+  Future<void> _apagarTreino(dynamic treino) async {
+    final nomeTreino = treino['nome'] ?? 'Treino sem nome';
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Apagar Treino'),
+        content: Text('Tem certeza que deseja apagar o treino "$nomeTreino"? Todos os exercícios vinculados serão removidos.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _confirmarApagarTreino(treino);
+            },
+            child: const Text(
+              'Apagar',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ IMPLEMENTAÇÃO CORRIGIDA DA DELEÇÃO EM CASCATA
+Future<void> _confirmarApagarTreino(dynamic treino) async {
+  try {
+    final idTreino = treino['id_treino'];
+    final nomeTreino = treino['nome'] ?? 'Treino sem nome';
+    
+    // Mostrar loading
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              strokeWidth: 2,
+            ),
+            const SizedBox(width: 16),
+            Text('Apagando treino "$nomeTreino"...'),
+          ],
+        ),
+        duration: const Duration(seconds: 30),
+        backgroundColor: const Color(0xFF5BA0E0),
+      ),
+    );
+
+    // 1. Buscar todos os treinolinks
+    final responseTreinosLink = await http.get(
+      Uri.parse('https://backend-tcc-iota.vercel.app/treinolink'),
+    );
+
+    if (responseTreinosLink.statusCode == 200) {
+      final todosTreinosLinks = json.decode(responseTreinosLink.body);
+      
+      // Filtrar apenas os links deste treino
+      final treinosLinksParaDeletar = todosTreinosLinks.where(
+        (link) => link['id_treino'] == idTreino
+      ).toList();
+
+      print('Encontrados ${treinosLinksParaDeletar.length} links para deletar');
+
+      // 2. Deletar cada treinolink SEQUENCIALMENTE (corrigido)
+      for (var link in treinosLinksParaDeletar) {
+        try {
+          final response = await http.delete(
+            Uri.parse('https://backend-tcc-iota.vercel.app/treinolink/${link['id_link']}'),
+          );
+          
+          if (response.statusCode == 200) {
+            print('✅ TreinoLink ${link['id_link']} deletado com sucesso');
+          } else {
+            print('❌ Erro ao deletar treinoLink ${link['id_link']}: ${response.statusCode}');
+          }
+        } catch (e) {
+          print('❌ Erro ao deletar treinoLink ${link['id_link']}: $e');
+        }
+      }
+
+      // 3. Agora deletar o treino
+      final responseTreino = await http.delete(
+        Uri.parse('https://backend-tcc-iota.vercel.app/treino/$idTreino'),
+      );
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (responseTreino.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Treino "$nomeTreino" apagado com sucesso!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        
+        // Recarregar a lista de treinos
+        _carregarTreinos();
+      } else {
+        throw Exception('Erro ao deletar treino: ${responseTreino.statusCode}');
+      }
+    } else {
+      throw Exception('Erro ao buscar treinos links: ${responseTreinosLink.statusCode}');
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    print('Erro ao apagar treino: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Erro ao apagar treino: $e'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+}
+
   void _abrirModalNovoTreino() {
     showModalBottomSheet(
       context: context,
@@ -595,24 +717,36 @@ class _ParteFisicaState extends State<ParteFisica> {
                     fontSize: 16,
                   ),
                 ),
-                trailing: ElevatedButton(
-                  onPressed: () {
-                    _verTreino(treino);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5BA0E0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // ✅ BOTÃO APAGAR TREINO
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _apagarTreino(treino),
                     ),
-                  ),
-                  child: const Text(
-                    'VER TREINO',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(width: 8),
+                    // ✅ BOTÃO VER TREINO
+                    ElevatedButton(
+                      onPressed: () {
+                        _verTreino(treino);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF5BA0E0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'VER TREINO',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             );
@@ -623,11 +757,11 @@ class _ParteFisicaState extends State<ParteFisica> {
   }
 
   void _verTreino(dynamic treino) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => TelaTreino(treino: treino),
-    ),
-  );
-}
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TelaTreino(treino: treino),
+      ),
+    );
+  }
 }
