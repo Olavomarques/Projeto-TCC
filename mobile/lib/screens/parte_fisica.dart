@@ -6,6 +6,7 @@ import 'home.dart';
 import '../services/localStorage.dart';
 import 'exercicios.dart';
 import 'treino.dart';
+import 'parte_mental.dart';
 
 class ParteFisica extends StatefulWidget {
   const ParteFisica({super.key});
@@ -427,11 +428,17 @@ Future<void> _confirmarApagarTreino(dynamic treino) async {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconButton(
-              icon: const FaIcon(FontAwesomeIcons.brain),
-              color: Colors.black,
-              onPressed: () {},
-            ),
+            
+IconButton(
+  icon: const FaIcon(FontAwesomeIcons.brain),
+  color: Colors.black,
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ParteMental()),
+    );
+  },
+),
             IconButton(
               icon: Container(
                 width: 50,

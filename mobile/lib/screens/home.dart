@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'parte_fisica.dart';
+import 'parte_mental.dart'; // ✅ ADICIONE ESTE IMPORT
 import '../services/localStorage.dart';
-import 'login.dart'; // ✅ ADICIONE ESTE IMPORT
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,15 +43,13 @@ class _HomePageState extends State<HomePage> {
       await localStorage.clearUserData();
       print('Dados limpos do localStorage');
       
-      // ✅ CORREÇÃO: Use MaterialPageRoute em vez de pushReplacementNamed
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false, // Remove todas as rotas anteriores
+        (route) => false,
       );
     } catch (e) {
       print('Erro durante logout: $e');
-      // Fallback seguro
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -82,11 +81,17 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // Ícone de mente (cérebro)
+            // ✅ Ícone de mente (cérebro) - AGORA COM NAVEGAÇÃO
             IconButton(
               icon: const FaIcon(FontAwesomeIcons.brain),
               color: Colors.black,
-              onPressed: () {},
+              onPressed: () {
+                // Navega para a tela ParteMental
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ParteMental()),
+                );
+              },
             ),
 
             // Ícone central (Home)
@@ -102,7 +107,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            // Ícone de halteres (exercício) - AGORA COM NAVEGAÇÃO
+            // Ícone de halteres (exercício) - COM NAVEGAÇÃO
             IconButton(
               icon: const FaIcon(FontAwesomeIcons.dumbbell),
               color: Colors.black,
