@@ -47,10 +47,10 @@ https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f
 
 ##  Equipe
 
-- João Lucas Ribeiro Leite
-- Maria Eduarda Silva Barroso
-- Milena da Silva Felisbelo
-- Olavo da Silva Marques
+- João Lucas Ribeiro Leite - Programador back/mobile
+- Maria Eduarda Silva Barroso - Scrum master
+- Milena da Silva Felisbelo - Programadora front
+- Olavo da Silva Marques - P.O./tester
 
 
 
@@ -70,4 +70,19 @@ https://www.figma.com/proto/Viq3FEL9eHNYxoNCbokoED/app-saude?node-id=143-612&p=f
 
 ### Gráfico Gant
 ![alt text](./assets/cronograma.png)
+
+
+### link versel:
+https://backend-tcc-iota.vercel.app/
+
+### link backend-tcc:
+https://github.com/jaolucas1234/backend-TCC
+
+### link Pages:
+https://milenafelisbelo.github.io/front_tcc/
+
+### link mobile-tcc:
+https://github.com/jaolucas1234/mobile_tcc
+
+
 
