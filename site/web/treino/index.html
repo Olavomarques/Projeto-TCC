@@ -2,30 +2,61 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Criar Treino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercícios - Pulse+</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
+
   <header>
     <a href="#" class="logo">Pulse <strong>+</strong></a>
-    <nav class="nav">
-      <a href="../UsuarioCadastrado/index.html">Home</a>
-      <a href="../treinoscriados/index.html">Treinos Criados</a>
-    </nav>
-  </header>
+  </header> 
 
-  <main>
-    <h2>Exercícios disponíveis</h2>
-    <div id="exercicios-lista"></div>
+  <div class="container">
 
-    <h2>Meu Treino</h2>
-    <div id="meu-treino"></div>
-
-    <div class="salvar-area">
-      <input type="text" id="nome-treino" placeholder="Digite o nome do treino">
-      <button id="salvar-treino">Salvar Treino</button>
+    <div class="logo-container">
+      <p class="app-subtitle">EXERCÍCIOS DISPONÍVEIS</p>
     </div>
-  </main>
+
+    <main id="main-content">
+
+      <div id="loading-state" class="state-container">
+        <div class="spinner"></div>
+        <p>Carregando exercícios...</p>
+      </div>
+
+      <div id="error-state" class="state-container hidden">
+        <i class="fas fa-exclamation-triangle error-icon"></i>
+        <p id="error-message">Erro ao carregar exercícios</p>
+        <button id="retry-btn" class="primary-btn">Tentar Novamente</button>
+      </div>
+
+      <div id="empty-state" class="state-container hidden">
+        <i class="fas fa-dumbbell empty-icon"></i>
+        <p>Nenhum exercício encontrado</p>
+      </div>
+
+      <div id="exercises-grid" class="exercises-grid hidden"></div>
+    </main>
+  </div>
+
+  <!-- MODAL -->
+  <div id="exercise-modal" class="modal hidden">
+    <div class="modal-body">
+      <div class="modal-header">
+        <h2 id="modal-title"></h2>
+        <button id="close-modal"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div id="modal-image" class="modal-img"></div>
+
+      <h3 class="modal-desc-title">Descrição:</h3>
+      <p id="modal-description" class="modal-description"></p>
+
+      <button id="modal-close-btn" class="modal-btn">FECHAR</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

@@ -7,16 +7,32 @@
 </head>
 <body>
 
-  <div class="chat-container">
-      <h2>Chat - Assistente IA</h2>
+  <header class="site-header">
+    <div class="header-inner container">
+      <a href="#" class="logo">Pulse <strong>+</strong></a>
 
-      <div id="chat-box" class="chat-box"></div>
+      <nav class="nav">
+        <a href="../UsuarioCadastrado/index.html">Voltar</a>
+      </nav>
+    </div>
+  </header>
 
-      <div class="input-area">
+  <section class="section">
+    <div class="container">
+      <div class="card chat-card">
+        
+        <h2 class="gradient">Chat - Assistente IA</h2>
+
+        <div id="chat-box" class="chat-box"></div>
+
+        <div class="input-area">
           <input type="text" id="user-input" placeholder="Digite sua mensagem...">
-          <button id="send-btn">Enviar</button>
+          <button id="send-btn" class="btn primary">Enviar</button>
+        </div>
+
       </div>
-  </div>
+    </div>
+  </section>
 
   <script src="script.js"></script>
 </body>
