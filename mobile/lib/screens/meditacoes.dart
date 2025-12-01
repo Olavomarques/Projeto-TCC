@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'parte_mental.dart';
-import 'meditacaouser.dart'; 
+import 'meditacaouser.dart';
 
 class MeditacoesScreen extends StatefulWidget {
   const MeditacoesScreen({super.key});
@@ -27,12 +27,10 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
   Future<void> _carregarMeditacoes() async {
     try {
       print('📡 Carregando meditações...');
-      
+
       final response = await http.get(
         Uri.parse('https://backend-tcc-iota.vercel.app/meditacao'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       print('📥 Status: ${response.statusCode}');
@@ -41,7 +39,7 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         print('🎯 Dados recebidos: $data');
-        
+
         if (data is List) {
           setState(() {
             _meditacoes = data.map((item) => Meditacao.fromJson(item)).toList();
@@ -49,9 +47,10 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
           });
         } else if (data['meditacoes'] is List) {
           setState(() {
-            _meditacoes = (data['meditacoes'] as List)
-                .map((item) => Meditacao.fromJson(item))
-                .toList();
+            _meditacoes =
+                (data['meditacoes'] as List)
+                    .map((item) => Meditacao.fromJson(item))
+                    .toList();
             _isLoading = false;
           });
         } else {
@@ -79,23 +78,42 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
   }
 
   void _iniciarMeditacaoComTempo(Meditacao meditacao, int tempoSegundos) {
+    print('🔍🔍🔍 VERIFICANDO ID DA MEDITAÇÃO:');
+    print('   ID original: ${meditacao.id}');
+    print('   Tipo: ${meditacao.id.runtimeType}');
+    print('   É vazio? ${meditacao.id.isEmpty}');
+    print('   Tamanho: ${meditacao.id.length}');
+
+    // ✅ FORÇAR CONVERSÃO PARA INT E VALIDAR
+    final int idMeditacao;
+
+    if (meditacao.id.isEmpty) {
+      print('⚠️ ATENÇÃO: ID está vazio! Usando valor padrão 1');
+      idMeditacao = 1; // Valor padrão para teste
+    } else {
+      // Tentar converter para int
+      idMeditacao = int.tryParse(meditacao.id) ?? 1;
+      print('✅ ID convertido: $idMeditacao');
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MeditacaoUser(
-          meditacao: {
-            'id': meditacao.id,
-            'titulo': meditacao.titulo,
-            'descricao': meditacao.descricao,
-            'descricaoCompleta': meditacao.descricaoCompleta,
-            'duracao': tempoSegundos ~/ 60,
-            'duracao_segundos': tempoSegundos,
-            'nivel': meditacao.nivel,
-            'categoria': meditacao.categoria,
-            'beneficios': meditacao.beneficios,
-            'audioUrl': meditacao.audioUrl,
-          },
-        ),
+        builder:
+            (context) => MeditacaoUser(
+              meditacao: {
+                'id': idMeditacao, // ⚠️ Agora é int, não string
+                'titulo': meditacao.titulo,
+                'descricao': meditacao.descricao,
+                'descricaoCompleta': meditacao.descricaoCompleta,
+                'duracao': tempoSegundos ~/ 60,
+                'duracao_segundos': tempoSegundos,
+                'nivel': meditacao.nivel,
+                'categoria': meditacao.categoria,
+                'beneficios': meditacao.beneficios,
+                'audioUrl': meditacao.audioUrl,
+              },
+            ),
       ),
     );
   }
@@ -118,10 +136,7 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
         ),
         title: const Text(
           'Meditações Guiadas',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -187,7 +202,10 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text('Tentar Novamente', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Tentar Novamente',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -219,7 +237,10 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text('Recarregar', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'Recarregar',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -280,7 +301,8 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                     const SizedBox(height: 4),
                     Text(
                       meditacao.descricao,
-                      style: const TextStyle( // ✅ CORREÇÃO
+                      style: const TextStyle(
+                        // ✅ CORREÇÃO
                         fontSize: 14,
                         color: Colors.grey,
                       ),
@@ -294,7 +316,8 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                         const SizedBox(width: 4),
                         Text(
                           '${meditacao.duracao} min',
-                          style: const TextStyle( // ✅ CORREÇÃO
+                          style: const TextStyle(
+                            // ✅ CORREÇÃO
                             fontSize: 12,
                             color: Colors.grey,
                           ),
@@ -304,7 +327,8 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                         const SizedBox(width: 4),
                         Text(
                           meditacao.nivel,
-                          style: const TextStyle( // ✅ CORREÇÃO
+                          style: const TextStyle(
+                            // ✅ CORREÇÃO
                             fontSize: 12,
                             color: Colors.grey,
                           ),
@@ -356,7 +380,7 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // ✅ CABEÇALHO DA MEDITAÇÃO
               Row(
                 children: [
@@ -389,7 +413,8 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                         const SizedBox(height: 4),
                         Text(
                           '${meditacao.duracao} min • ${meditacao.nivel}',
-                          style: const TextStyle( // ✅ CORREÇÃO
+                          style: const TextStyle(
+                            // ✅ CORREÇÃO
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -399,9 +424,9 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // ✅ DESCRIÇÃO
               const Text(
                 'Descrição',
@@ -414,15 +439,16 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
               const SizedBox(height: 8),
               Text(
                 meditacao.descricaoCompleta,
-                style: const TextStyle( // ✅ CORREÇÃO
+                style: const TextStyle(
+                  // ✅ CORREÇÃO
                   fontSize: 14,
                   color: Colors.grey,
                   height: 1.5,
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // ✅ BENEFÍCIOS
               const Text(
                 'Benefícios',
@@ -436,19 +462,23 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: meditacao.beneficios.map((beneficio) {
-                  return Chip(
-                    label: Text(
-                      beneficio,
-                      style: const TextStyle(fontSize: 12, color: Colors.white),
-                    ),
-                    backgroundColor: const Color(0xFF5BA0E0),
-                  );
-                }).toList(),
+                children:
+                    meditacao.beneficios.map((beneficio) {
+                      return Chip(
+                        label: Text(
+                          beneficio,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                        backgroundColor: const Color(0xFF5BA0E0),
+                      );
+                    }).toList(),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // ✅ SELEÇÃO DE TEMPO PERSONALIZADO
               Container(
                 padding: const EdgeInsets.all(16),
@@ -477,46 +507,52 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                     const SizedBox(height: 12),
                     const Text(
                       'Escolha por quanto tempo deseja meditar:',
-                      style: TextStyle( // ✅ CORREÇÃO
+                      style: TextStyle(
+                        // ✅ CORREÇÃO
                         fontSize: 14,
                         color: Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // ✅ OPÇÕES DE TEMPO
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: _temposPredefinidos.map((tempo) {
-                        final minutos = tempo ~/ 60;
-                        final isSelected = _tempoSelecionado == tempo;
-                        
-                        return ChoiceChip(
-                          label: Text(
-                            '$minutos min',
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              _tempoSelecionado = tempo;
-                            });
-                          },
-                          selectedColor: const Color(0xFF5BA0E0),
-                          backgroundColor: Colors.grey.shade200, // ✅ CORREÇÃO
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          _temposPredefinidos.map((tempo) {
+                            final minutos = tempo ~/ 60;
+                            final isSelected = _tempoSelecionado == tempo;
+
+                            return ChoiceChip(
+                              label: Text(
+                                '$minutos min',
+                                style: TextStyle(
+                                  color:
+                                      isSelected
+                                          ? Colors.white
+                                          : Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  _tempoSelecionado = tempo;
+                                });
+                              },
+                              selectedColor: const Color(0xFF5BA0E0),
+                              backgroundColor:
+                                  Colors.grey.shade200, // ✅ CORREÇÃO
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            );
+                          }).toList(),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // ✅ INDICADOR DO TEMPO SELECIONADO
                     Container(
                       width: double.infinity,
@@ -524,7 +560,9 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFF5BA0E0).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFF5BA0E0).withOpacity(0.3)),
+                        border: Border.all(
+                          color: const Color(0xFF5BA0E0).withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -549,9 +587,9 @@ class _MeditacoesScreenState extends State<MeditacoesScreen> {
                   ],
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // ✅ BOTÃO PARA INICIAR MEDITAÇÃO
               SizedBox(
                 width: double.infinity,
@@ -628,8 +666,10 @@ class Meditacao {
       id: json['id']?.toString() ?? '',
       titulo: json['titulo']?.toString() ?? 'Meditação',
       descricao: json['descricao']?.toString() ?? 'Descrição da meditação',
-      descricaoCompleta: json['descricaoCompleta']?.toString() ?? 
-          json['descricao']?.toString() ?? 'Descrição completa da meditação',
+      descricaoCompleta:
+          json['descricaoCompleta']?.toString() ??
+          json['descricao']?.toString() ??
+          'Descrição completa da meditação',
       duracao: _parseDuracao(json['duracao']),
       nivel: json['nivel']?.toString() ?? 'Iniciante',
       categoria: json['categoria']?.toString() ?? 'Geral',

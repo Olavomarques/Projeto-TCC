@@ -21,44 +21,46 @@ class _MeditacaoUserState extends State<MeditacaoUser> {
   bool _meditacaoFinalizada = false;
   bool _musicaCarregada = false;
   double _volume = 0.3;
-  
+
   final AudioService _audioService = AudioService();
-  final LocalStorageService _localStorage = LocalStorageService(); // ✅ LOCALSTORAGE
+  final LocalStorageService _localStorage =
+      LocalStorageService(); // ✅ LOCALSTORAGE
 
   @override
-void initState() {
-  super.initState();
-  _inicializarTudo();
-}
-
-Future<void> _inicializarTudo() async {
-  // ✅ USA O TEMPO PERSONALIZADO DA MEDITAÇÃO (em segundos)
-  _tempoTotal = widget.meditacao['duracao_segundos'] ?? 
-               (widget.meditacao['duracao'] * 60) ?? 
-               300; // Fallback 5 minutos
-  
-  _tempoRestante = _tempoTotal;
-  
-  _musicaCarregada = await _audioService.inicializarMusica();
-  
-  if (_musicaCarregada) {
-    await _audioService.setVolume(_volume);
+  void initState() {
+    super.initState();
+    _inicializarTudo();
   }
-  
-  print('🎵 Status música: $_musicaCarregada');
-  print('⏰ Tempo total: ${_formatTime(_tempoTotal)}');
-}
+
+  Future<void> _inicializarTudo() async {
+    // ✅ USA O TEMPO PERSONALIZADO DA MEDITAÇÃO (em segundos)
+    _tempoTotal =
+        widget.meditacao['duracao_segundos'] ??
+        (widget.meditacao['duracao'] * 60) ??
+        300; // Fallback 5 minutos
+
+    _tempoRestante = _tempoTotal;
+
+    _musicaCarregada = await _audioService.inicializarMusica();
+
+    if (_musicaCarregada) {
+      await _audioService.setVolume(_volume);
+    }
+
+    print('🎵 Status música: $_musicaCarregada');
+    print('⏰ Tempo total: ${_formatTime(_tempoTotal)}');
+  }
 
   // ✅ MÉTODO _salvarMeditacaoNoBanco ATUALIZADO - REQUISIÇÃO DIRETA
   Future<void> _salvarMeditacaoNoBanco() async {
     try {
       print('💾 Salvando meditação no banco...');
-      
+
       // ✅ OBTER DADOS DO USUÁRIO
-      final userId = await _localStorage.getUserId();
+      final userIdStr = await _localStorage.getUserId();
       final token = await _localStorage.getUserToken();
-      
-      if (userId == null || token == null) {
+
+      if (userIdStr == null || token == null) {
         print('❌ Usuário não logado');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -69,27 +71,93 @@ Future<void> _inicializarTudo() async {
         return;
       }
 
-      // ✅ EXTRAIR ID DA MEDITAÇÃO
-      final idMeditacao = int.tryParse(widget.meditacao['id']?.toString() ?? '0') ?? 0;
-      
-      print('🔍 Dados para salvar:');
-      print('🔍 User ID: $userId');
-      print('🔍 Meditação ID: $idMeditacao');
-      print('🔍 Duração: $_tempoTotal segundos');
+      // ✅ CONVERTER USER ID PARA INT (IMPORTANTE!)
+      final int userId;
+      try {
+        userId = int.parse(userIdStr);
+        print('✅ User ID convertido: $userId (tipo: int)');
+      } catch (e) {
+        print('❌ Erro ao converter User ID: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro: ID do usuário inválido'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-      // ✅ REQUISIÇÃO DIRETA - IGUAL SUAS OUTRAS TELAS
+      // ✅ EXTRAIR ID DA MEDITAÇÃO DE FORMA CORRETA
+      final int idMeditacao;
+      final dynamic idRaw = widget.meditacao['id'];
+
+      print('🔍 ID raw da meditação: $idRaw (tipo: ${idRaw?.runtimeType})');
+
+      if (idRaw == null) {
+        print('❌ ID da meditação é nulo');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro: ID da meditação não encontrado'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // Converter baseado no tipo
+      if (idRaw is int) {
+        idMeditacao = idRaw;
+      } else if (idRaw is String) {
+        idMeditacao = int.tryParse(idRaw) ?? 0;
+        if (idMeditacao == 0) {
+          print('❌ String não pôde ser convertida para int: $idRaw');
+        }
+      } else if (idRaw is double) {
+        idMeditacao = idRaw.toInt();
+      } else {
+        print('❌ Tipo não suportado: ${idRaw.runtimeType}');
+        idMeditacao = 0;
+      }
+
+      print('✅ ID meditação convertido: $idMeditacao (tipo: int)');
+
+      if (idMeditacao <= 0) {
+        print('❌ ID da meditação inválido: $idMeditacao');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Erro: ID da meditação inválido'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // ✅ PREPARAR DADOS PARA ENVIO
+      final Map<String, dynamic> requestBody = {
+        'id_user': userId, // ⚠️ Já é int, NÃO converter de novo
+        'id_meditacao': idMeditacao, // ⚠️ Já é int, NÃO converter de novo
+        'duracao': _tempoTotal, // ⚠️ Já é int
+        'data': DateTime.now().toIso8601String(),
+      };
+
+      print('📤 Dados que serão enviados:');
+      print(
+        '   id_user: ${requestBody['id_user']} (tipo: ${requestBody['id_user'].runtimeType})',
+      );
+      print(
+        '   id_meditacao: ${requestBody['id_meditacao']} (tipo: ${requestBody['id_meditacao'].runtimeType})',
+      );
+      print('   duracao: ${requestBody['duracao']}');
+      print('   data: ${requestBody['data']}');
+
+      // ✅ ENVIAR REQUISIÇÃO
       final response = await http.post(
         Uri.parse('https://backend-tcc-iota.vercel.app/meduser'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: json.encode({
-          'id_user': int.parse(userId),
-          'id_meditacao': idMeditacao,
-          'duracao': _tempoTotal,
-          'data': DateTime.now().toIso8601String(),
-        }),
+        body: json.encode(requestBody),
       );
 
       print('📡 Status da resposta: ${response.statusCode}');
@@ -97,7 +165,7 @@ Future<void> _inicializarTudo() async {
 
       if (response.statusCode == 201) {
         print('✅ Meditação salva com sucesso!');
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Meditação de ${_formatTime(_tempoTotal)} salva! ✅'),
@@ -106,22 +174,39 @@ Future<void> _inicializarTudo() async {
           ),
         );
       } else {
-        print('❌ Erro ao salvar: ${response.statusCode}');
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ${response.statusCode}: ${response.body}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        print('❌ Erro HTTP: ${response.statusCode}');
+
+        // Tentar parsear a resposta de erro
+        try {
+          final errorData = json.decode(response.body);
+          print('❌ Erro do backend: $errorData');
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Erro ${response.statusCode}: ${errorData['error'] ?? response.body}',
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro ${response.statusCode}: ${response.body}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       }
     } catch (e) {
       print('❌ Erro na requisição: $e');
-      
+      print('❌ StackTrace: ${e.toString()}');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro de conexão: $e'),
+          content: Text('Erro de conexão: ${e.toString()}'),
           backgroundColor: Colors.orange,
           duration: const Duration(seconds: 3),
         ),
@@ -135,7 +220,7 @@ Future<void> _inicializarTudo() async {
     if (_musicaCarregada && !_audioService.isPlaying) {
       await _audioService.toggleMusica();
     }
-    
+
     setState(() {
       _isPlaying = true;
       _meditacaoFinalizada = false;
@@ -148,7 +233,7 @@ Future<void> _inicializarTudo() async {
     if (_musicaCarregada && _audioService.isPlaying) {
       await _audioService.toggleMusica();
     }
-    
+
     setState(() {
       _isPlaying = false;
     });
@@ -171,7 +256,7 @@ Future<void> _inicializarTudo() async {
     if (_musicaCarregada && _audioService.isPlaying) {
       await _audioService.pararMusica();
     }
-    
+
     setState(() {
       _isPlaying = false;
       _meditacaoFinalizada = true;
@@ -188,13 +273,11 @@ Future<void> _inicializarTudo() async {
     });
   }
 
-  
-
   void _mudarVolume(double novoVolume) async {
     setState(() {
       _volume = novoVolume;
     });
-    
+
     if (_musicaCarregada) {
       await _audioService.setVolume(_volume);
     }
@@ -216,10 +299,12 @@ Future<void> _inicializarTudo() async {
     super.dispose();
   }
 
-  String get _titulo => widget.meditacao['titulo']?.toString() ?? 'Meditação Guiada';
-  String get _descricao => widget.meditacao['descricaoCompleta']?.toString() ?? 
-                          widget.meditacao['descricao']?.toString() ?? 
-                          'Relaxe e foque na sua respiração...';
+  String get _titulo =>
+      widget.meditacao['titulo']?.toString() ?? 'Meditação Guiada';
+  String get _descricao =>
+      widget.meditacao['descricaoCompleta']?.toString() ??
+      widget.meditacao['descricao']?.toString() ??
+      'Relaxe e foque na sua respiração...';
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +314,7 @@ Future<void> _inicializarTudo() async {
         child: Column(
           children: [
             _buildHeader(),
-            
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -254,10 +339,14 @@ Future<void> _inicializarTudo() async {
           const SizedBox(width: 16),
           const Text(
             'Meditação Guiada',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const Spacer(),
-          
+
           IconButton(
             icon: Icon(
               _audioService.isPlaying ? Icons.music_note : Icons.music_off,
@@ -276,8 +365,6 @@ Future<void> _inicializarTudo() async {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          
-
           Container(
             width: 150,
             height: 150,
@@ -293,24 +380,53 @@ Future<void> _inicializarTudo() async {
             ),
           ),
 
-        Text(_titulo, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 20),
-        
-        // ✅ MOSTRAR O TEMPO ESCOLHIDO
-        Column(
-          children: [
-Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0), fontSize: 48, fontWeight: FontWeight.bold)),            const SizedBox(height: 4),
-            Text(
-              'Tempo escolhido: ${_tempoTotal ~/ 60} minutos',
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
+          Text(
+            _titulo,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
-          ],
-        ),
-          
-          const SizedBox(height: 30),
-          Text(_titulo, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(height: 20),
-          Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0), fontSize: 48, fontWeight: FontWeight.bold)),
+
+          // ✅ MOSTRAR O TEMPO ESCOLHIDO
+          Column(
+            children: [
+              Text(
+                _formatTime(_tempoRestante),
+                style: const TextStyle(
+                  color: Color(0xFF5BA0E0),
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Tempo escolhido: ${_tempoTotal ~/ 60} minutos',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 30),
+          Text(
+            _titulo,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            _formatTime(_tempoRestante),
+            style: const TextStyle(
+              color: Color(0xFF5BA0E0),
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 10),
           LinearProgressIndicator(
             value: _tempoTotal > 0 ? 1 - (_tempoRestante / _tempoTotal) : 0,
@@ -319,20 +435,24 @@ Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0
             minHeight: 6,
           ),
           const SizedBox(height: 30),
-           Expanded(
-          child: SingleChildScrollView(
-            child: Text(
-              _descricao,
-              style: const TextStyle(color: Colors.white70, fontSize: 16, height: 1.5),
-              textAlign: TextAlign.center,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Text(
+                _descricao,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 30),
-        
-        _buildControles(),
-        _buildIndicadorMusica(),
-      ],
+          const SizedBox(height: 30),
+
+          _buildControles(),
+          _buildIndicadorMusica(),
+        ],
       );
     } else {
       return Column(
@@ -340,27 +460,40 @@ Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0
         children: [
           Icon(Icons.check_circle, color: Colors.green, size: 80),
           const SizedBox(height: 20),
-          Text('Meditação Finalizada!', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+          Text(
+            'Meditação Finalizada!',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 10),
-          Text('Você meditou por ${_formatTime(_tempoTotal)}', style: const TextStyle(color: Colors.white70, fontSize: 16)),
+          Text(
+            'Você meditou por ${_formatTime(_tempoTotal)}',
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
+          ),
           const SizedBox(height: 30),
           ElevatedButton.icon(
             onPressed: _reiniciarMeditacao,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5BA0E0),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
             icon: const Icon(Icons.replay, color: Colors.white),
-            label: const Text('Nova Meditação', style: TextStyle(color: Colors.white)),
+            label: const Text(
+              'Nova Meditação',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           _buildIndicadorMusica(),
         ],
       );
     }
   }
-
-
 
   Widget _buildControles() {
     return Row(
@@ -372,32 +505,45 @@ Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
             icon: const Icon(Icons.pause, color: Colors.white),
             label: const Text('Pausar', style: TextStyle(color: Colors.white)),
           ),
         ] else ...[
           ElevatedButton.icon(
-            onPressed: _tempoRestante > 0 ? _iniciarMeditacao : _reiniciarMeditacao,
+            onPressed:
+                _tempoRestante > 0 ? _iniciarMeditacao : _reiniciarMeditacao,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF5BA0E0),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
-            icon: Icon(_tempoRestante == _tempoTotal ? Icons.play_arrow : Icons.replay, color: Colors.white),
-            label: Text(_tempoRestante == _tempoTotal ? 'Iniciar' : 'Reiniciar', style: const TextStyle(color: Colors.white)),
+            icon: Icon(
+              _tempoRestante == _tempoTotal ? Icons.play_arrow : Icons.replay,
+              color: Colors.white,
+            ),
+            label: Text(
+              _tempoRestante == _tempoTotal ? 'Iniciar' : 'Reiniciar',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
-        
+
         const SizedBox(width: 16),
-        
+
         ElevatedButton.icon(
           onPressed: _finalizarMeditacao,
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
           ),
           icon: const Icon(Icons.stop, color: Colors.white),
           label: const Text('Finalizar', style: TextStyle(color: Colors.white)),
@@ -415,26 +561,30 @@ Text(_formatTime(_tempoRestante), style: const TextStyle(color: Color(0xFF5BA0E0
           children: [
             Icon(
               _musicaCarregada ? Icons.music_note : Icons.music_off,
-              color: _musicaCarregada ? 
-                (_audioService.isPlaying ? Colors.green : Colors.orange) 
-                : Colors.grey,
+              color:
+                  _musicaCarregada
+                      ? (_audioService.isPlaying ? Colors.green : Colors.orange)
+                      : Colors.grey,
               size: 16,
             ),
             const SizedBox(width: 8),
             Text(
-              _musicaCarregada ? 
-                '${_audioService.currentMusicName} - ${_audioService.isPlaying ? 'Tocando' : 'Pausada'}' 
-                : 'Música não disponível',
+              _musicaCarregada
+                  ? '${_audioService.currentMusicName} - ${_audioService.isPlaying ? 'Tocando' : 'Pausada'}'
+                  : 'Música não disponível',
               style: TextStyle(
-                color: _musicaCarregada ? 
-                  (_audioService.isPlaying ? Colors.green : Colors.orange) 
-                  : Colors.grey,
+                color:
+                    _musicaCarregada
+                        ? (_audioService.isPlaying
+                            ? Colors.green
+                            : Colors.orange)
+                        : Colors.grey,
                 fontSize: 12,
               ),
             ),
           ],
         ),
-        
+
         if (_musicaCarregada && _audioService.isPlaying) ...[
           const SizedBox(height: 10),
           Row(

@@ -11,7 +11,7 @@ class CadastroPage extends StatefulWidget {
 }
 
 class _CadastroPageState extends State<CadastroPage> {
-  String? genero = 'F';
+  String sexo = 'F'; // ✅ Alterado de 'genero' para 'sexo'
   String dia = '1';
   String mes = 'Janeiro';
   String ano = '2005';
@@ -27,13 +27,12 @@ class _CadastroPageState extends State<CadastroPage> {
     final email = emailController.text.trim().toLowerCase();
     final senha = senhaController.text.trim();
 
-    String generoSelecionado;
-    if (genero == 'F') {
-      generoSelecionado = 'FEMININO';
-    } else if (genero == 'M') {
-      generoSelecionado = 'MASCULINO';
+    // ✅ Formatação do sexo
+    String sexoFormatado;
+    if (sexo == 'F') {
+      sexoFormatado = 'FEMININO';
     } else {
-      generoSelecionado = 'OUTRO';
+      sexoFormatado = 'MASCULINO';
     }
 
     String nascimentoIso =
@@ -58,7 +57,7 @@ class _CadastroPageState extends State<CadastroPage> {
           "nome": nome,
           "email": email,
           "senha": senha,
-          "genero": generoSelecionado,
+          "genero": sexoFormatado, // ✅ Enviando como "genero" para o backend
           "nascimento": nascimentoIso,
         }),
       );
@@ -235,27 +234,30 @@ class _CadastroPageState extends State<CadastroPage> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Text('Gênero:', style: TextStyle(color: Colors.white)),
+                // ✅ ALTERADO: "Sexo" em vez de "Gênero"
+                const Text('Sexo:', style: TextStyle(color: Colors.white)),
                 Row(
                   children: [
+                    // ✅ APENAS Feminino e Masculino (removido "Outro")
                     Radio<String>(
                       value: 'F',
-                      groupValue: genero,
-                      onChanged: (value) => setState(() => genero = value),
+                      groupValue: sexo,
+                      onChanged: (value) => setState(() => sexo = value!),
                     ),
-                    const Text('F', style: TextStyle(color: Colors.white)),
+                    const Text(
+                      'Feminino',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(width: 20),
                     Radio<String>(
                       value: 'M',
-                      groupValue: genero,
-                      onChanged: (value) => setState(() => genero = value),
+                      groupValue: sexo,
+                      onChanged: (value) => setState(() => sexo = value!),
                     ),
-                    const Text('M', style: TextStyle(color: Colors.white)),
-                    Radio<String>(
-                      value: 'Outro',
-                      groupValue: genero,
-                      onChanged: (value) => setState(() => genero = value),
+                    const Text(
+                      'Masculino',
+                      style: TextStyle(color: Colors.white),
                     ),
-                    const Text('Outro', style: TextStyle(color: Colors.white)),
                   ],
                 ),
                 const SizedBox(height: 20),

@@ -21,82 +21,85 @@ class _ChatIaState extends State<ChatIa> {
   void initState() {
     super.initState();
     // Mensagem de boas-vindas inicial
-    _messages.add(Message(
-      text: "Olá! Sou sua assistente de saúde mental. Como posso ajudar você hoje? Pode falar sobre seus pensamentos, emoções ou qualquer coisa que esteja sentindo.",
-      isUser: false,
-      timestamp: DateTime.now(),
-    ));
-  }
-
-Future<void> _sendMessage(String message) async {
-  if (message.trim().isEmpty) return;
-
-  // Adiciona mensagem do usuário
-  setState(() {
-    _messages.add(Message(
-      text: message,
-      isUser: true,
-      timestamp: DateTime.now(),
-    ));
-    _isLoading = true;
-  });
-
-  _messageController.clear();
-  _scrollToBottom();
-
-  try {
-    print('📤 Enviando mensagem: $message');
-
-    // ✅ CORREÇÃO: Use 'text' como campo esperado pela API
-    final response = await http.post(
-      Uri.parse('https://backend-tcc-iota.vercel.app/mensagem'),
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Accept': 'application/json',
-      },
-      body: json.encode({
-        'text': message.trim(),  // 🔥 CORREÇÃO AQUI
-      }),
-    );
-
-    print('📥 Status Code: ${response.statusCode}');
-    print('📥 Response Body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      print('📦 Dados recebidos: $data');
-      
-      // ✅ A API retorna { response: "texto da IA" }
-      final String resposta = data['response'] ?? 'Desculpe, não consegui processar sua mensagem.';
-
-      print('💬 Resposta da IA: $resposta');
-
-      setState(() {
-        _messages.add(Message(
-          text: resposta,
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-        _isLoading = false;
-      });
-    } else {
-      print('❌ Erro ${response.statusCode}: ${response.body}');
-      throw Exception('Erro na API: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('❌ Erro no chat: $e');
-    setState(() {
-      _messages.add(Message(
-        text: "Desculpe, estou tendo problemas para me conectar. Por favor, tente novamente em alguns instantes.",
+    _messages.add(
+      Message(
+        text: "Olá! Sou sua assistente Pulse+ como posso ajudar?.",
         isUser: false,
         timestamp: DateTime.now(),
-      ));
-      _isLoading = false;
-    });
+      ),
+    );
   }
 
-  _scrollToBottom();
-}
+  Future<void> _sendMessage(String message) async {
+    if (message.trim().isEmpty) return;
+
+    // Adiciona mensagem do usuário
+    setState(() {
+      _messages.add(
+        Message(text: message, isUser: true, timestamp: DateTime.now()),
+      );
+      _isLoading = true;
+    });
+
+    _messageController.clear();
+    _scrollToBottom();
+
+    try {
+      print('📤 Enviando mensagem: $message');
+
+      // ✅ CORREÇÃO: Use 'text' como campo esperado pela API
+      final response = await http.post(
+        Uri.parse('https://backend-tcc-iota.vercel.app/mensagem'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'text': message.trim(), // 🔥 CORREÇÃO AQUI
+        }),
+      );
+
+      print('📥 Status Code: ${response.statusCode}');
+      print('📥 Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print('📦 Dados recebidos: $data');
+
+        // ✅ A API retorna { response: "texto da IA" }
+        final String resposta =
+            data['response'] ??
+            'Desculpe, não consegui processar sua mensagem.';
+
+        print('💬 Resposta da IA: $resposta');
+
+        setState(() {
+          _messages.add(
+            Message(text: resposta, isUser: false, timestamp: DateTime.now()),
+          );
+          _isLoading = false;
+        });
+      } else {
+        print('❌ Erro ${response.statusCode}: ${response.body}');
+        throw Exception('Erro na API: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Erro no chat: $e');
+      setState(() {
+        _messages.add(
+          Message(
+            text:
+                "Desculpe, estou tendo problemas para me conectar. Por favor, tente novamente em alguns instantes.",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        );
+        _isLoading = false;
+      });
+    }
+
+    _scrollToBottom();
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -206,10 +209,7 @@ Future<void> _sendMessage(String message) async {
                         ),
                         Text(
                           'Online • Pronto para ajudar',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.green,
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.green),
                         ),
                       ],
                     ),
@@ -290,13 +290,14 @@ Future<void> _sendMessage(String message) async {
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
-                      onPressed: _isLoading
-                          ? null
-                          : () {
-                              if (_messageController.text.trim().isNotEmpty) {
-                                _sendMessage(_messageController.text.trim());
-                              }
-                            },
+                      onPressed:
+                          _isLoading
+                              ? null
+                              : () {
+                                if (_messageController.text.trim().isNotEmpty) {
+                                  _sendMessage(_messageController.text.trim());
+                                }
+                              },
                     ),
                   ),
                 ],
@@ -313,9 +314,8 @@ Future<void> _sendMessage(String message) async {
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: message.isUser
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
+        mainAxisAlignment:
+            message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
           if (!message.isUser)
             Container(
@@ -325,20 +325,15 @@ Future<void> _sendMessage(String message) async {
                 color: const Color(0xFF5BA0E0),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(
-                Icons.smart_toy,
-                color: Colors.white,
-                size: 16,
-              ),
+              child: const Icon(Icons.smart_toy, color: Colors.white, size: 16),
             ),
           if (!message.isUser) const SizedBox(width: 8),
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: message.isUser
-                    ? const Color(0xFF5BA0E0)
-                    : Colors.grey[100],
+                color:
+                    message.isUser ? const Color(0xFF5BA0E0) : Colors.grey[100],
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -355,9 +350,7 @@ Future<void> _sendMessage(String message) async {
                   Text(
                     _formatTime(message.timestamp),
                     style: TextStyle(
-                      color: message.isUser
-                          ? Colors.white70
-                          : Colors.grey[600],
+                      color: message.isUser ? Colors.white70 : Colors.grey[600],
                       fontSize: 10,
                     ),
                   ),
@@ -374,11 +367,7 @@ Future<void> _sendMessage(String message) async {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 16,
-              ),
+              child: const Icon(Icons.person, color: Colors.white, size: 16),
             ),
         ],
       ),
@@ -398,11 +387,7 @@ Future<void> _sendMessage(String message) async {
               color: const Color(0xFF5BA0E0),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.smart_toy,
-              color: Colors.white,
-              size: 16,
-            ),
+            child: const Icon(Icons.smart_toy, color: Colors.white, size: 16),
           ),
           const SizedBox(width: 8),
           Flexible(
@@ -460,9 +445,5 @@ class Message {
   final bool isUser;
   final DateTime timestamp;
 
-  Message({
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
+  Message({required this.text, required this.isUser, required this.timestamp});
 }

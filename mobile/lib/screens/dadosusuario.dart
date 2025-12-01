@@ -42,13 +42,13 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
         'Content-Type': 'application/json',
       };
 
-      // Buscar todos os dados físicos e filtrar pelo userId
+      // Buscar todos os dados físicos
       final responseFisicos = await http.get(
         Uri.parse('$_baseUrl/dadosfisicos'),
         headers: headers,
       );
 
-      // Buscar todos os dados mentais e filtrar pelo userId
+      // Buscar todos os dados mentais
       final responseMentais = await http.get(
         Uri.parse('$_baseUrl/dadosmentais'),
         headers: headers,
@@ -57,25 +57,24 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
       setState(() {
         if (responseFisicos.statusCode == 200) {
           final List<dynamic> data = json.decode(responseFisicos.body);
-          _dadosFisicos = data.cast<Map<String, dynamic>>().where(
-                (item) => item['id_user'].toString() == userId,
-              ).toList();
-          // Ordenar por ID para ter o inicial primeiro
-          _dadosFisicos.sort((a, b) => a['id_dadosfisicos'].compareTo(b['id_dadosfisicos']));
+          _dadosFisicos =
+              data
+                  .cast<Map<String, dynamic>>()
+                  .where((item) => item['id_user'].toString() == userId)
+                  .toList();
         }
 
         if (responseMentais.statusCode == 200) {
           final List<dynamic> data = json.decode(responseMentais.body);
-          _dadosMentais = data.cast<Map<String, dynamic>>().where(
-                (item) => item['id_user'].toString() == userId,
-              ).toList();
-          // Ordenar por ID para ter o inicial primeiro
-          _dadosMentais.sort((a, b) => a['id_dadosmentais'].compareTo(b['id_dadosmentais']));
+          _dadosMentais =
+              data
+                  .cast<Map<String, dynamic>>()
+                  .where((item) => item['id_user'].toString() == userId)
+                  .toList();
         }
 
         _carregando = false;
       });
-
     } catch (error) {
       print('Erro ao carregar dados: $error');
       setState(() {
@@ -84,20 +83,50 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
     }
   }
 
+  // Dados Físicos Iniciais (primeiro registro - menor ID)
   Map<String, dynamic>? get _dadosFisicosIniciais {
-    return _dadosFisicos.isNotEmpty ? _dadosFisicos[0] : null;
+    if (_dadosFisicos.isEmpty) return null;
+
+    // Ordenar por ID em ordem crescente
+    final listaOrdenada = List<Map<String, dynamic>>.from(_dadosFisicos);
+    listaOrdenada.sort(
+      (a, b) => a['id_dadosfisicos'].compareTo(b['id_dadosfisicos']),
+    );
+    return listaOrdenada.first;
   }
 
+  // Dados Físicos Atuais (último registro - maior ID)
   Map<String, dynamic>? get _dadosFisicosAtuais {
-    return _dadosFisicos.length > 1 ? _dadosFisicos[1] : _dadosFisicosIniciais;
+    if (_dadosFisicos.isEmpty) return null;
+
+    // Ordenar por ID em ordem decrescente
+    final listaOrdenada = List<Map<String, dynamic>>.from(_dadosFisicos);
+    listaOrdenada.sort(
+      (a, b) => b['id_dadosfisicos'].compareTo(a['id_dadosfisicos']),
+    );
+    return listaOrdenada.first;
   }
 
+  // Dados Mentais Iniciais (primeiro registro - menor ID)
   Map<String, dynamic>? get _dadosMentaisIniciais {
-    return _dadosMentais.isNotEmpty ? _dadosMentais[0] : null;
+    if (_dadosMentais.isEmpty) return null;
+
+    final listaOrdenada = List<Map<String, dynamic>>.from(_dadosMentais);
+    listaOrdenada.sort(
+      (a, b) => a['id_dadosmentais'].compareTo(b['id_dadosmentais']),
+    );
+    return listaOrdenada.first;
   }
 
+  // Dados Mentais Atuais (último registro - maior ID)
   Map<String, dynamic>? get _dadosMentaisAtuais {
-    return _dadosMentais.length > 1 ? _dadosMentais[1] : _dadosMentaisIniciais;
+    if (_dadosMentais.isEmpty) return null;
+
+    final listaOrdenada = List<Map<String, dynamic>>.from(_dadosMentais);
+    listaOrdenada.sort(
+      (a, b) => b['id_dadosmentais'].compareTo(a['id_dadosmentais']),
+    );
+    return listaOrdenada.first;
   }
 
   double _calcularIMC(double altura, double peso) {
@@ -132,7 +161,7 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
     } else if (campo == 'idade') {
       valorParaEditar = valorAtual.replaceAll(' anos', '');
     }
-    
+
     _mostrarDialogoEdicao(campo, valorParaEditar, true);
   }
 
@@ -144,11 +173,11 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
 
   void _mostrarDialogoEdicao(String campo, String valorAtual, bool isFisico) {
     final controller = TextEditingController(text: valorAtual);
-    
+
     // Definir o tipo de teclado baseado no campo
     TextInputType keyboardType = TextInputType.text;
     String hintText = 'Digite o novo valor';
-    
+
     if (isFisico) {
       switch (campo) {
         case 'altura':
@@ -163,47 +192,91 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
           keyboardType = TextInputType.number;
           hintText = 'Ex: 25';
           break;
+        case 'exeReg':
+        case 'obj':
+        case 'deli':
+          keyboardType = TextInputType.text;
+          hintText = 'Digite o novo valor';
+          break;
         default:
           keyboardType = TextInputType.text;
+          hintText = 'Digite o novo valor';
       }
     } else {
-      if (campo == 'sonoPerDia' || campo == 'trabPerDia' || campo == 'tempHobby') {
+      if (campo == 'sonoPerDia' ||
+          campo == 'trabPerDia' ||
+          campo == 'tempHobby') {
         keyboardType = TextInputType.number;
         hintText = 'Ex: 8';
+      } else {
+        keyboardType = TextInputType.text;
+        hintText = 'Digite o novo valor';
       }
     }
-    
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Editar $campo'),
-        content: TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            labelText: 'Novo valor',
-            hintText: hintText,
-            border: const OutlineInputBorder(),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Editar ${_formatarNomeCampo(campo)}'),
+            content: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                labelText: 'Novo valor',
+                hintText: hintText,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _atualizarDado(campo, controller.text, isFisico);
+                  Navigator.pop(context);
+                },
+                child: const Text('Salvar'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _atualizarDado(campo, controller.text, isFisico);
-              Navigator.pop(context);
-            },
-            child: const Text('Salvar'),
-          ),
-        ],
-      ),
     );
   }
 
-  Future<void> _atualizarDado(String campo, String novoValor, bool isFisico) async {
+  String _formatarNomeCampo(String campo) {
+    switch (campo) {
+      case 'altura':
+        return 'Altura';
+      case 'peso':
+        return 'Peso';
+      case 'idade':
+        return 'Idade';
+      case 'exeReg':
+        return 'Exercícios Regulares';
+      case 'obj':
+        return 'Objetivo';
+      case 'deli':
+        return 'Delimitações';
+      case 'sonoPerDia':
+        return 'Sono por Dia';
+      case 'trabPerDia':
+        return 'Trabalho por Dia';
+      case 'tempHobby':
+        return 'Tempo para Hobbies';
+      case 'transt':
+        return 'Transtornos/Observações';
+      default:
+        return campo;
+    }
+  }
+
+  Future<void> _atualizarDado(
+    String campo,
+    String novoValor,
+    bool isFisico,
+  ) async {
     try {
       final String? userId = await _localStorage.getUserId();
       final String? token = await _localStorage.getUserToken();
@@ -215,57 +288,50 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
         'Content-Type': 'application/json',
       };
 
-      // CORREÇÃO: Usar PUT para atualizar o registro existente
       if (isFisico) {
         final dadosAtuais = _dadosFisicosAtuais;
         if (dadosAtuais == null) return;
 
         final dadosAtualizados = {...dadosAtuais};
 
-        // Atualizar apenas o campo que mudou
-        switch (campo) {
-          case 'altura':
-            dadosAtualizados['altura'] = double.tryParse(novoValor) ?? 0.0;
-            break;
-          case 'peso':
-            dadosAtualizados['peso'] = double.tryParse(novoValor) ?? 0.0;
-            break;
-          case 'idade':
-            dadosAtualizados['idade'] = int.tryParse(novoValor) ?? 0;
-            break;
-          case 'exeReg':
-            dadosAtualizados['exeReg'] = novoValor;
-            break;
-          case 'obj':
-            dadosAtualizados['obj'] = novoValor;
-            break;
-          case 'deli':
-            dadosAtualizados['deli'] = novoValor.isEmpty ? null : novoValor;
-            break;
+        // Atualizar o campo específico
+        if (campo == 'altura') {
+          dadosAtualizados['altura'] = double.tryParse(novoValor) ?? 0.0;
+        } else if (campo == 'peso') {
+          dadosAtualizados['peso'] = double.tryParse(novoValor) ?? 0.0;
+        } else if (campo == 'idade') {
+          dadosAtualizados['idade'] = int.tryParse(novoValor) ?? 0;
+        } else if (campo == 'exeReg') {
+          dadosAtualizados['exeReg'] = novoValor;
+        } else if (campo == 'obj') {
+          dadosAtualizados['obj'] = novoValor;
+        } else if (campo == 'deli') {
+          dadosAtualizados['deli'] = novoValor.isEmpty ? null : novoValor;
         }
 
-        // CORREÇÃO: Usar PUT para atualizar o registro existente
         final idDadosFisicos = dadosAtuais['id_dadosfisicos'];
         await http.put(
           Uri.parse('$_baseUrl/dadosfisicos/$idDadosFisicos'),
           headers: headers,
           body: json.encode(dadosAtualizados),
         );
-
       } else {
         final dadosAtuais = _dadosMentaisAtuais;
         if (dadosAtuais == null) return;
 
         final dadosAtualizados = {...dadosAtuais};
 
-        // Atualizar apenas o campo que mudou
-        if (campo == 'sonoPerDia' || campo == 'trabPerDia' || campo == 'tempHobby') {
-          dadosAtualizados[campo] = int.tryParse(novoValor) ?? 0;
+        // Atualizar o campo específico
+        if (campo == 'sonoPerDia') {
+          dadosAtualizados['sonoPerDia'] = int.tryParse(novoValor) ?? 0;
+        } else if (campo == 'trabPerDia') {
+          dadosAtualizados['trabPerDia'] = int.tryParse(novoValor) ?? 0;
+        } else if (campo == 'tempHobby') {
+          dadosAtualizados['tempHobby'] = int.tryParse(novoValor) ?? 0;
         } else if (campo == 'transt') {
-          dadosAtualizados[campo] = novoValor.isEmpty ? null : novoValor;
+          dadosAtualizados['transt'] = novoValor.isEmpty ? null : novoValor;
         }
 
-        // CORREÇÃO: Usar PUT para atualizar o registro existente
         final idDadosMentais = dadosAtuais['id_dadosmentais'];
         await http.put(
           Uri.parse('$_baseUrl/dadosmentais/$idDadosMentais'),
@@ -283,12 +349,88 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
           backgroundColor: Colors.green,
         ),
       );
-
     } catch (error) {
       print('Erro ao atualizar dado: $error');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Erro ao atualizar: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _criarDadosAtuais() async {
+    try {
+      final String? userId = await _localStorage.getUserId();
+      final String? token = await _localStorage.getUserToken();
+
+      if (userId == null || token == null) return;
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      bool criouAlgum = false;
+
+      // Criar dados físicos atuais se não existirem
+      if (_dadosFisicosIniciais != null && _dadosFisicos.length == 1) {
+        final dadosFisicosAtuais = {
+          'altura': _dadosFisicosIniciais!['altura'],
+          'peso': _dadosFisicosIniciais!['peso'],
+          'idade': _dadosFisicosIniciais!['idade'],
+          'sexo': _dadosFisicosIniciais!['sexo'],
+          'exeReg': _dadosFisicosIniciais!['exeReg'],
+          'obj': _dadosFisicosIniciais!['obj'],
+          'deli': _dadosFisicosIniciais!['deli'],
+          'id_user': int.parse(userId!),
+        };
+
+        await http.post(
+          Uri.parse('$_baseUrl/dadosfisicos'),
+          headers: headers,
+          body: json.encode(dadosFisicosAtuais),
+        );
+        criouAlgum = true;
+      }
+
+      // Criar dados mentais atuais se não existirem
+      if (_dadosMentaisIniciais != null && _dadosMentais.length == 1) {
+        final dadosMentaisAtuais = {
+          'sonoPerDia': _dadosMentaisIniciais!['sonoPerDia'],
+          'trabPerDia': _dadosMentaisIniciais!['trabPerDia'],
+          'tempHobby': _dadosMentaisIniciais!['tempHobby'],
+          'transt': _dadosMentaisIniciais!['transt'],
+          'id_user': int.parse(userId!),
+        };
+
+        await http.post(
+          Uri.parse('$_baseUrl/dadosmentais'),
+          headers: headers,
+          body: json.encode(dadosMentaisAtuais),
+        );
+        criouAlgum = true;
+      }
+
+      if (criouAlgum) {
+        // Recarregar dados
+        _carregarDados();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Dados atuais criados com sucesso! Agora você pode editá-los.',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (error) {
+      print('Erro ao criar dados atuais: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao criar dados atuais: $error'),
           backgroundColor: Colors.red,
         ),
       );
@@ -303,11 +445,12 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => FormularioDadosIniciaisScreen(
-        onSalvar: () {
-          _carregarDados();
-        },
-      ),
+      builder:
+          (context) => FormularioDadosIniciaisScreen(
+            onSalvar: () {
+              _carregarDados();
+            },
+          ),
     );
   }
 
@@ -321,9 +464,12 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: _carregando
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF5BA0E0)))
-          : _dadosFisicos.isEmpty && _dadosMentais.isEmpty
+      body:
+          _carregando
+              ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF5BA0E0)),
+              )
+              : _dadosFisicos.isEmpty && _dadosMentais.isEmpty
               ? _buildSemDados()
               : _buildComDados(),
     );
@@ -361,10 +507,7 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
           const Text(
             'Para acompanhar seu progresso, precisamos conhecer melhor você',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 30),
           ElevatedButton(
@@ -388,11 +531,61 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
   }
 
   Widget _buildComDados() {
+    final temApenasIniciais =
+        _dadosFisicos.length == 1 && _dadosMentais.length == 1;
+    final temDadosAtuais = _dadosFisicos.length > 1 || _dadosMentais.length > 1;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ✅ BOTÃO PARA CRIAR DADOS ATUAIS (se não existirem)
+          if (temApenasIniciais)
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    const Icon(
+                      Icons.add_circle_outline,
+                      color: Color(0xFF5BA0E0),
+                      size: 40,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Criar Dados Atuais',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Clique para criar uma cópia editável dos seus dados',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 15),
+                    ElevatedButton(
+                      onPressed: _criarDadosAtuais,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF5BA0E0),
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Criar Dados Atuais'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+          if (temApenasIniciais) const SizedBox(height: 20),
+
           // DADOS FÍSICOS INICIAIS
           if (_dadosFisicosIniciais != null) ...[
             _buildCardDadosFisicos(
@@ -403,8 +596,8 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
             const SizedBox(height: 20),
           ],
 
-          // DADOS FÍSICOS ATUAIS
-          if (_dadosFisicosAtuais != null && _dadosFisicos.length > 1) ...[
+          // DADOS FÍSICOS ATUAIS (se existirem)
+          if (temDadosAtuais && _dadosFisicosAtuais != null) ...[
             _buildCardDadosFisicos(
               'Dados Físicos - Atuais',
               _dadosFisicosAtuais!,
@@ -423,12 +616,12 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
             const SizedBox(height: 20),
           ],
 
-          // DADOS MENTAIS ATUAIS
-          if (_dadosMentaisAtuais != null && _dadosMentais.length > 1) ...[
+          // DADOS MENTAIS ATUAIS (se existirem)
+          if (temDadosAtuais && _dadosMentaisAtuais != null) ...[
             _buildCardDadosMentais(
               'Dados Mentais - Atuais',
               _dadosMentaisAtuais!,
-              true, // editável
+              true, // NÃO editável (mantido como false)
             ),
           ],
         ],
@@ -436,7 +629,11 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
     );
   }
 
-  Widget _buildCardDadosFisicos(String titulo, Map<String, dynamic> dados, bool editavel) {
+  Widget _buildCardDadosFisicos(
+    String titulo,
+    Map<String, dynamic> dados,
+    bool editavel,
+  ) {
     final altura = dados['altura']?.toDouble() ?? 0.0;
     final peso = dados['peso']?.toDouble() ?? 0.0;
     final imc = _calcularIMC(altura, peso);
@@ -444,9 +641,7 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
 
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -479,14 +674,55 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildInfoRowEditavel('Altura', '${altura.toStringAsFixed(2)} m', editavel, 'altura', true),
-            _buildInfoRowEditavel('Peso', '${peso.toStringAsFixed(1)} kg', editavel, 'peso', true),
-            _buildInfoRowEditavel('Idade', '${dados['idade']} anos', editavel, 'idade', true),
-            _buildInfoRowEditavel('Exercícios Regulares', dados['exeReg'] ?? '', editavel, 'exeReg', false),
-            _buildInfoRowEditavel('Objetivo', dados['obj'] ?? '', editavel, 'obj', false),
-            if (dados['deli'] != null)
-              _buildInfoRowEditavel('Delimitações', dados['deli']!, editavel, 'deli', false),
-            
+            // ✅ ALTURA - EDITÁVEL se for dados atuais
+            _buildInfoRowEditavel(
+              'Altura',
+              '${altura.toStringAsFixed(2)} m',
+              editavel,
+              'altura',
+              true,
+            ),
+            // ✅ PESO - EDITÁVEL se for dados atuais
+            _buildInfoRowEditavel(
+              'Peso',
+              '${peso.toStringAsFixed(1)} kg',
+              editavel,
+              'peso',
+              true,
+            ),
+            // ✅ IDADE - EDITÁVEL se for dados atuais
+            _buildInfoRowEditavel(
+              'Idade',
+              '${dados['idade']} anos',
+              editavel,
+              'idade',
+              true,
+            ),
+            // ⚠️ SEXO - NUNCA EDITÁVEL
+            _buildInfoRow(
+              'Sexo',
+              dados['sexo'] == 'MASCULINO' ? 'Masculino' : 'Feminino',
+            ),
+            // ✅ EXERCÍCIOS REGULARES - EDITÁVEL se for dados atuais
+            _buildInfoRowEditavel(
+              'Exercícios Regulares',
+              dados['exeReg'] ?? '',
+              editavel,
+              'exeReg',
+              true,
+            ),
+            // ✅ OBJETIVO - EDITÁVEL se for dados atuais
+            _buildInfoRowEditavel(
+              'Objetivo',
+              dados['obj'] ?? '',
+              editavel,
+              'obj',
+              true,
+            ),
+            // ⚠️ DELIMITAÇÕES - NUNCA EDITÁVEL (só mostra se existir)
+            if (dados['deli'] != null && dados['deli'].toString().isNotEmpty)
+              _buildInfoRow('Delimitações', dados['deli']!),
+
             // IMC
             const SizedBox(height: 20),
             Container(
@@ -503,7 +739,7 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${editavel ? 'IMC Atual' : 'IMC Inicial'}',
+                        editavel ? 'IMC Atual' : 'IMC Inicial',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -537,12 +773,14 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
     );
   }
 
-  Widget _buildCardDadosMentais(String titulo, Map<String, dynamic> dados, bool editavel) {
+  Widget _buildCardDadosMentais(
+    String titulo,
+    Map<String, dynamic> dados,
+    bool editavel,
+  ) {
     return Card(
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -575,18 +813,78 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildInfoRowEditavel('Sono por Dia', '${dados['sonoPerDia']} horas', editavel, 'sonoPerDia', true),
-            _buildInfoRowEditavel('Trabalho por Dia', '${dados['trabPerDia']} horas', editavel, 'trabPerDia', true),
-            _buildInfoRowEditavel('Tempo para Hobbies', '${dados['tempHobby']} horas', editavel, 'tempHobby', true),
-            if (dados['transt'] != null)
-              _buildInfoRowEditavel('Transtornos/Observações', dados['transt']!, editavel, 'transt', false),
+            // ✅ DADOS MENTAIS ATUAIS - EDITÁVEIS
+            _buildInfoRowEditavel(
+              'Sono por Dia',
+              '${dados['sonoPerDia']} horas',
+              editavel,
+              'sonoPerDia',
+              false, // isFisico = false para dados mentais
+            ),
+            _buildInfoRowEditavel(
+              'Trabalho por Dia',
+              '${dados['trabPerDia']} horas',
+              editavel,
+              'trabPerDia',
+              false,
+            ),
+            _buildInfoRowEditavel(
+              'Tempo para Hobbies',
+              '${dados['tempHobby']} horas',
+              editavel,
+              'tempHobby',
+              false,
+            ),
+            if (dados['transt'] != null &&
+                dados['transt'].toString().isNotEmpty)
+              _buildInfoRowEditavel(
+                'Transtornos/Observações',
+                dados['transt']!,
+                editavel,
+                'transt',
+                false,
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRowEditavel(String titulo, String valor, bool editavel, String campo, bool isFisico) {
+  // Widget para informações NÃO editáveis
+  Widget _buildInfoRow(String titulo, String valor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              titulo,
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            ),
+            Text(
+              valor,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget para informações EDITÁVEIS
+  Widget _buildInfoRowEditavel(
+    String titulo,
+    String valor,
+    bool editavel,
+    String campo,
+    bool isFisico,
+  ) {
     if (editavel) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -610,27 +908,20 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
               children: [
                 Text(
                   titulo,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 Row(
                   children: [
                     Text(
                       valor,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(
-                      Icons.edit,
-                      size: 16,
-                      color: Colors.grey[400],
-                    ),
+                    Icon(Icons.edit, size: 16, color: Colors.grey[400]),
                   ],
                 ),
               ],
@@ -639,32 +930,7 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
         ),
       );
     } else {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                titulo,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-              Text(
-                valor,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      return _buildInfoRow(titulo, valor);
     }
   }
 }
@@ -672,16 +938,15 @@ class _DadosUsuarioScreenState extends State<DadosUsuarioScreen> {
 class FormularioDadosIniciaisScreen extends StatefulWidget {
   final Function onSalvar;
 
-  const FormularioDadosIniciaisScreen({
-    super.key,
-    required this.onSalvar,
-  });
+  const FormularioDadosIniciaisScreen({super.key, required this.onSalvar});
 
   @override
-  State<FormularioDadosIniciaisScreen> createState() => _FormularioDadosIniciaisScreenState();
+  State<FormularioDadosIniciaisScreen> createState() =>
+      _FormularioDadosIniciaisScreenState();
 }
 
-class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisScreen> {
+class _FormularioDadosIniciaisScreenState
+    extends State<FormularioDadosIniciaisScreen> {
   final _formKey = GlobalKey<FormState>();
   final LocalStorageService _localStorage = LocalStorageService();
   final String _baseUrl = 'https://backend-tcc-iota.vercel.app';
@@ -723,7 +988,7 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
         'Content-Type': 'application/json',
       };
 
-      // Preparar dados físicos
+      // ✅ Criar APENAS UM registro para cada tipo (Dados Iniciais)
       final dadosFisicos = {
         'altura': double.parse(_alturaController.text),
         'peso': double.parse(_pesoController.text),
@@ -735,38 +1000,23 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
         'id_user': int.parse(userId),
       };
 
-      // Preparar dados mentais
       final dadosMentais = {
         'sonoPerDia': int.parse(_sonoController.text),
         'trabPerDia': int.parse(_trabalhoController.text),
         'tempHobby': int.parse(_hobbyController.text),
-        'transt': _transtController.text.isNotEmpty ? _transtController.text : null,
+        'transt':
+            _transtController.text.isNotEmpty ? _transtController.text : null,
         'id_user': int.parse(userId),
       };
 
-      // MODIFICAÇÃO: Criar DOIS registros para cada tipo de dado
-      // Primeiro registro: Dados Iniciais (fixos)
+      // Criar dados físicos iniciais
       await http.post(
         Uri.parse('$_baseUrl/dadosfisicos'),
         headers: headers,
         body: json.encode(dadosFisicos),
       );
 
-      // Segundo registro: Dados Atuais (editáveis) - mesmo valor inicial
-      await http.post(
-        Uri.parse('$_baseUrl/dadosfisicos'),
-        headers: headers,
-        body: json.encode(dadosFisicos),
-      );
-
-      // Primeiro registro: Dados Mentais Iniciais (fixos)
-      await http.post(
-        Uri.parse('$_baseUrl/dadosmentais'),
-        headers: headers,
-        body: json.encode(dadosMentais),
-      );
-
-      // Segundo registro: Dados Mentais Atuais (editáveis) - mesmo valor inicial
+      // Criar dados mentais iniciais
       await http.post(
         Uri.parse('$_baseUrl/dadosmentais'),
         headers: headers,
@@ -782,7 +1032,6 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
           backgroundColor: Colors.green,
         ),
       );
-
     } catch (error) {
       print('Erro ao salvar dados: $error');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -808,7 +1057,7 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
             const Padding(
               padding: EdgeInsets.all(16),
               child: CircularProgressIndicator(),
-            )
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -820,10 +1069,7 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
             children: [
               const Text(
                 'Dados Físicos Iniciais',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
@@ -888,7 +1134,10 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
               const SizedBox(height: 15),
 
               // Sexo
-              const Text('Sexo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const Text(
+                'Sexo',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
               Row(
                 children: [
                   Radio<Sexo>(
@@ -965,10 +1214,7 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
               // DADOS MENTAIS
               const Text(
                 'Dados Mentais Iniciais',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
@@ -982,7 +1228,8 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Informe as horas de sono';
+                  if (value == null || value.isEmpty)
+                    return 'Informe as horas de sono';
                   final sono = int.tryParse(value);
                   if (sono == null || sono < 0 || sono > 24) {
                     return 'Horas de sono inválidas';
@@ -1002,7 +1249,8 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Informe as horas de trabalho';
+                  if (value == null || value.isEmpty)
+                    return 'Informe as horas de trabalho';
                   final trabalho = int.tryParse(value);
                   if (trabalho == null || trabalho < 0 || trabalho > 24) {
                     return 'Horas de trabalho inválidas';
@@ -1022,7 +1270,8 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'Informe o tempo para hobbies';
+                  if (value == null || value.isEmpty)
+                    return 'Informe o tempo para hobbies';
                   final hobby = int.tryParse(value);
                   if (hobby == null || hobby < 0 || hobby > 24) {
                     return 'Tempo para hobbies inválido';
@@ -1057,19 +1306,22 @@ class _FormularioDadosIniciaisScreenState extends State<FormularioDadosIniciaisS
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: _enviando
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  child:
+                      _enviando
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                          : const Text(
+                            'Salvar Dados Iniciais',
+                            style: TextStyle(fontSize: 16),
                           ),
-                        )
-                      : const Text(
-                          'Salvar Dados Iniciais',
-                          style: TextStyle(fontSize: 16),
-                        ),
                 ),
               ),
             ],
