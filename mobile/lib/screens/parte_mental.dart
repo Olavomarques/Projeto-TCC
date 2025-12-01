@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'home.dart';
 import 'chatia.dart';
 import 'parte_fisica.dart'; 
+import 'meditacoes.dart';
+import 'dadosusuario.dart';
 
 class ParteMental extends StatefulWidget {
   const ParteMental({super.key});
@@ -314,13 +316,11 @@ class _ParteMentalState extends State<ParteMental> {
   }
 
   void _irParaMeditacao() {
-    // TODO: Implementar navegação para tela de meditação
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Navegando para Meditação...'),
-        duration: Duration(seconds: 1),
-      ),
-    );
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) => const MeditacoesScreen()),
+     );
+    
+    
   }
 
   void _irParaConversaIA() {
@@ -331,12 +331,9 @@ class _ParteMentalState extends State<ParteMental> {
   }
 
   void _irParaEstatisticas() {
-    // TODO: Implementar navegação para estatísticas
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Navegando para Estatísticas...'),
-        duration: Duration(seconds: 1),
-      ),
-    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const DadosUsuarioScreen()), 
+     );
   }
 }

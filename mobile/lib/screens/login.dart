@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           final String? userId = data["id_user"]?.toString();
           
           if (userId != null && userId.isNotEmpty) {
-            await localStorage.saveUserData(userId, token, email);
+            await localStorage.saveUserData(userId, token, email, "Usuário");
             
             print('✅ ID_USER SALVO: $userId');
             print('✅ TOKEN SALVO: $token');
